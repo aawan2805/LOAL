@@ -4,6 +4,7 @@ import edu.upc.epsevg.prop.loa.CellType;
 import edu.upc.epsevg.prop.loa.GameStatus;
 import edu.upc.epsevg.prop.loa.IPlayer;
 import edu.upc.epsevg.prop.loa.Move;
+import edu.upc.epsevg.prop.loa.SearchType;
 import java.awt.Point;
 import java.util.Random;
 
@@ -28,7 +29,7 @@ public class LOAL implements IPlayer {
      */
     @Override
     public Move move(GameStatus s) {
-        return null;
+        return new Move(null, null, 0, 0, SearchType.RANDOM);
     }
 
     /**
@@ -48,6 +49,6 @@ public class LOAL implements IPlayer {
      */
     @Override
     public String getName() {
-        return "Human(" + name + ")";
+        return "LOAL";
     }
 }
