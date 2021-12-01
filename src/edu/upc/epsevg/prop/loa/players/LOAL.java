@@ -29,6 +29,21 @@ public class LOAL implements IPlayer {
      */
     @Override
     public Move move(GameStatus s) {
+        int Valor = Integer.MIN_VALUE;
+        Move pos = null;
+        
+        CellType currPlayer = s.getCurrentPlayer();
+        // Recorremos el número de fichas que tenemos en la partida
+        for (int i = 0; i < s.getNumberOfPiecesPerColor(currPlayer); i++) {
+            // Cogemos la primera posición de la primera ficha
+            Point posFicha = s.getPiece(currPlayer, i);
+            // Iteramos sobre sus posibles movimientos
+            for(Point mov: s.getMoves(posFicha)){
+                // TODO: mov és pieza del adversario?
+                
+            }
+        }
+        
         return new Move(null, null, 0, 0, SearchType.RANDOM);
     }
 
