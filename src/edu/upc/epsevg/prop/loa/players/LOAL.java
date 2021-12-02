@@ -49,6 +49,8 @@ public class LOAL implements IPlayer, IAuto {
                 */
                 // Movemos la ficha
                 aux.movePiece(posFicha, mov);
+                // TODO: Check if is solution
+                
             }
         }
         return new Move(null, null, 0, 0, SearchType.RANDOM);
