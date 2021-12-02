@@ -2,6 +2,7 @@ package edu.upc.epsevg.prop.loa.players;
 
 import edu.upc.epsevg.prop.loa.CellType;
 import edu.upc.epsevg.prop.loa.GameStatus;
+import edu.upc.epsevg.prop.loa.IAuto;
 import edu.upc.epsevg.prop.loa.IPlayer;
 import edu.upc.epsevg.prop.loa.Move;
 import edu.upc.epsevg.prop.loa.SearchType;
@@ -12,7 +13,7 @@ import java.util.Random;
  * Jugador humà de LOA
  * @author bernat
  */
-public class LOAL implements IPlayer {
+public class LOAL implements IPlayer, IAuto {
 
     String name;
 
