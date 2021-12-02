@@ -72,7 +72,7 @@ public class LOAL implements IPlayer, IAuto {
      * @param beta Valor heurístico más pequeño hasta el momento
      * @param profundidad Profundidad máxima a explorar
      * @param jugador Ficha del jugador (O ó @)
-     * @return El valor beta más pequeño posible a partir del tablero t.
+     * @return El valor beta más pequeño posible a partir del tablero s.
      */
     public int MinValor(GameStatus s, int alfa, int beta, int profundidad, CellType jugador){
         if(profundidad == 0) return 0;
@@ -112,7 +112,7 @@ public class LOAL implements IPlayer, IAuto {
      * @param beta Valor heurístico más pequeño hasta el momento
      * @param profundidad Profundidad máxima a explorar
      * @param jugador Ficha del jugador (O ó @)
-     * @return El valor beta más pequeño posible a partir del tablero t.
+     * @return El valor alfa más grande posible a partir del tablero s.
      */
     public int MaxValor(GameStatus s, int alfa, int beta, int profundidad, CellType jugador){
         if(profundidad == 0) return 0;
