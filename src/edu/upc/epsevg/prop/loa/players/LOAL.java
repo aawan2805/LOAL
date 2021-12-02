@@ -106,6 +106,43 @@ public class LOAL implements IPlayer, IAuto {
     }
 
     /**
+     *
+     * @param s Estado del juego (tablero)
+     * @param alfa Valor heurístico más grande hasta el momento
+     * @param beta Valor heurístico más pequeño hasta el momento
+     * @param profundidad Profundidad máxima a explorar
+     * @param jugador Ficha del jugador (O ó @)
+     * @return El valor beta más pequeño posible a partir del tablero t.
+     */
+    public int MaxValor(GameStatus s, int alfa, int beta, int profundidad, CellType jugador){
+        if(profundidad == 0) return 0;
+
+        for (int i = 0; i < s.getNumberOfPiecesPerColor(jugador); i++) {
+            // Cogemos la primera posición de la primera ficha
+            Point posFicha = s.getPiece(jugador, i);
+            // Iteramos sobre sus posibles movimientos
+            for(Point mov: s.getMoves(posFicha)){
+                GameStatus aux = new GameStatus(s);
+                // TODO: mov és pieza del adversario?
+                /*
+                if(s.getPos(mov) != currPlayer){
+                    // Se va a comer la pieza del enemigo!
+                }
+                */
+                // Movemos la ficha, tener en cuenta si se come una ficha mía, eso me beneficia
+                aux.movePiece(posFicha, mov);
+                if(aux.isGameOver() && aux.GetWinner() == jugador){
+                    // Vamos bien!
+                    return Integer.MAX_VALUE;
+                }
+
+            }
+        }
+
+        return alfa;
+    }
+    
+    /**
      * Ens avisa que hem de parar la cerca en curs perquè s'ha exhaurit el temps
      * de joc.
      */
