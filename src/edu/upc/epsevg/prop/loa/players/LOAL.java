@@ -40,9 +40,13 @@ public class LOAL implements IPlayer {
             // Iteramos sobre sus posibles movimientos
             for(Point mov: s.getMoves(posFicha)){
                 // TODO: mov és pieza del adversario?
+                /*
                 if(s.getPos(mov) != currPlayer){
                     // Se va a comer la pieza del enemigo!
                 }
+                */
+                // Movemos la ficha
+                s.movePiece(posFicha, mov);
             }
         }
         
