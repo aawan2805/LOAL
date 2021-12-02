@@ -23,9 +23,9 @@ public class Game {
                 
                 //IPlayer player1 = new HumanPlayer("Octopus");
                 IPlayer player1 = new RandomPlayer("Random");
-                IPlayer player2 = new LOAL("Humano");
+                IPlayer player2 = new LOAL("LOAL");
                                 
-                new Board(player1 , player2, 4, Level.DIFFICULT);
+                new Board(player1 , player2, 4, Level.EASY);
              }
         });
     }

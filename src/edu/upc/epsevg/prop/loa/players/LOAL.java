@@ -16,9 +16,15 @@ import java.util.Random;
 public class LOAL implements IPlayer, IAuto {
     String name;
     CellType player;
+    int profundidad;
 
     public LOAL(String name) {
         this.name = name;
+    }
+
+    public LOAL(String name, int profundidad){
+        this.name = name;
+        this.profundidad = profundidad;
     }
 
     /**
