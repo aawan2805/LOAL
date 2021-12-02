@@ -65,7 +65,11 @@ public class LOAL implements IPlayer, IAuto {
                     break;
                 }
                 // TODO: Check if is solution
-
+                int x = MinValor(aux, Integer.MIN_VALUE, Integer.MAX_VALUE, this.profundidad-1, this.player);
+                if(x > Valor){
+                    from = posFicha;
+                    to = mov;
+                }
             }
         }
         return new Move(from, to, 0, 0, SearchType.RANDOM);
