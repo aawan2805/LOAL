@@ -14,8 +14,8 @@ import java.util.Random;
  * @author bernat
  */
 public class LOAL implements IPlayer, IAuto {
-
     String name;
+    CellType player;
 
     public LOAL(String name) {
         this.name = name;
@@ -33,13 +33,14 @@ public class LOAL implements IPlayer, IAuto {
         int Valor = Integer.MIN_VALUE;
         Move pos = null;
         
-        CellType currPlayer = s.getCurrentPlayer();
+        this.player = s.getCurrentPlayer();
         // Recorremos el número de fichas que tenemos en la partida
-        for (int i = 0; i < s.getNumberOfPiecesPerColor(currPlayer); i++) {
+        for (int i = 0; i < s.getNumberOfPiecesPerColor(this.player); i++) {
             // Cogemos la primera posición de la primera ficha
-            Point posFicha = s.getPiece(currPlayer, i);
+            Point posFicha = s.getPiece(this.player, i);
             // Iteramos sobre sus posibles movimientos
             for(Point mov: s.getMoves(posFicha)){
+                GameStatus aux = new GameStatus(s);
                 // TODO: mov és pieza del adversario?
                 /*
                 if(s.getPos(mov) != currPlayer){
@@ -47,10 +48,9 @@ public class LOAL implements IPlayer, IAuto {
                 }
                 */
                 // Movemos la ficha
-                s.movePiece(posFicha, mov);
+                aux.movePiece(posFicha, mov);
             }
         }
-        
         return new Move(null, null, 0, 0, SearchType.RANDOM);
     }
 
