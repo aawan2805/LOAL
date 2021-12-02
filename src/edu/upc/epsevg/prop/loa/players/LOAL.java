@@ -31,11 +31,13 @@ public class LOAL implements IPlayer, IAuto {
     @Override
     public Move move(GameStatus s) {
         int Valor = Integer.MIN_VALUE;
-        Move pos = null;
+        Point from = null;
+        Point to = null;
+        boolean win = false;
         
         this.player = s.getCurrentPlayer();
         // Recorremos el número de fichas que tenemos en la partida
-        for (int i = 0; i < s.getNumberOfPiecesPerColor(this.player); i++) {
+        for (int i = 0; i < s.getNumberOfPiecesPerColor(this.player) && !win; i++) {
             // Cogemos la primera posición de la primera ficha
             Point posFicha = s.getPiece(this.player, i);
             // Iteramos sobre sus posibles movimientos
@@ -49,11 +51,18 @@ public class LOAL implements IPlayer, IAuto {
                 */
                 // Movemos la ficha
                 aux.movePiece(posFicha, mov);
+                if(aux.isGameOver() && aux.GetWinner() == this.player){
+                    // Hemos ganado
+                    from = posFicha;
+                    to = mov;
+                    win = true;
+                    break;
+                }
                 // TODO: Check if is solution
-                
+
             }
         }
-        return new Move(null, null, 0, 0, SearchType.RANDOM);
+        return new Move(from, to, 0, 0, SearchType.RANDOM);
     }
 
     /**
