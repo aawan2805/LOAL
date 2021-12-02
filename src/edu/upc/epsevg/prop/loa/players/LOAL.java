@@ -98,7 +98,8 @@ public class LOAL implements IPlayer, IAuto {
                     // Vamos mal!
                     return Integer.MIN_VALUE;
                 }
-
+                beta = Math.min(beta, MaxValor(aux, alfa, beta, profundidad-1, jugador));
+                if(beta <= alfa) return beta;
             }
         }
 
@@ -135,7 +136,8 @@ public class LOAL implements IPlayer, IAuto {
                     // Vamos bien!
                     return Integer.MAX_VALUE;
                 }
-
+                alfa = Math.max(alfa, MinValor(aux, alfa, beta, profundidad - 1, jugador));
+                if(alfa >= beta) return alfa;
             }
         }
 
