@@ -15,16 +15,22 @@ import java.util.Map;
  * @author Abdullah Bashir Yasmin, Mario Konstanty Kochan
  */
 public class DisjointSet {
-    private Map<Point, Point> parent = new HashMap<>();
+    int[] rank, parent;
+    int n;
+    
+    public DisjointSet(int n){
+        this.rank = new int[n];
+        this.parent = new int[n];
+        this.n = n;
+        makeSet();
+    }
  
     /**
      * Rellena el parent, lo que dice es que cada punto es parent de sí mismo.
      * @param universe Lista de puntos iniciales
      */
-    public void makeSet(ArrayList<Point> universe){
-        for (Point i: universe) {
-            parent.put(i, i);
-        }
+    public void makeSet(){
+        for(int i = 0; i < this.n; i++) parent[i] = i;
     }
  
     /**
@@ -32,13 +38,11 @@ public class DisjointSet {
      * @param k El punto a buscar
      * @return El padre del punto k.
      */
-    public Point Find(Point k){
-        if (parent.get(k) == k) {
-            return k;
-        }
- 
+    public int Find(int p){
+        if(parent[p] != p) parent[p] = Find(parent[p]);
+        
         // recur for the parent until we find the root
-        return Find(parent.get(k));
+        return parent[p];
     }
  
     /**
@@ -46,12 +50,48 @@ public class DisjointSet {
      * @param a Punto a unir.
      * @param b Punto a unir.
      */
-    public void Union(Point a, Point b)
+    public void Union(int x, int y)
     {
-        // find the root of the sets in which elements `x` and `y` belongs
-        Point x = Find(a);
-        Point y = Find(b);
- 
-        parent.put(x, y);
+        // Find representatives of two sets
+        int xRoot = Find(x), yRoot = Find(y);
+  
+        // Elements are in the same set, no need
+        // to unite anything.
+        if (xRoot == yRoot)
+            return;
+  
+        // If x's rank is less than y's rank
+        if (rank[xRoot] < rank[yRoot])
+  
+            // Then move x under y  so that depth
+            // of tree remains less
+            parent[xRoot] = yRoot;
+  
+        // Else if y's rank is less than x's rank
+        else if (rank[yRoot] < rank[xRoot])
+  
+            // Then move y under x so that depth of
+            // tree remains less
+            parent[yRoot] = xRoot;
+  
+        else // if ranks are the same
+        {
+            // Then move y under x (doesn't matter
+            // which one goes where)
+            parent[yRoot] = xRoot;
+  
+            // And increment the result tree's
+            // rank by 1
+            rank[xRoot] = rank[xRoot] + 1;
+        }
+    }
+    
+    /**
+     * Imprime por pantalla el conjunto parent.
+     */
+    public void printSet(){
+        for (int i = 0; i < this.n; i++) {
+            System.out.println(parent[i] + " => " + rank[i]);
+        }
     }
 }
