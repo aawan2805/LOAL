@@ -7,6 +7,7 @@ import edu.upc.epsevg.prop.loa.IPlayer;
 import edu.upc.epsevg.prop.loa.Move;
 import edu.upc.epsevg.prop.loa.SearchType;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -85,7 +86,7 @@ public class LOAL implements IPlayer, IAuto {
      * @return El valor beta más pequeño posible a partir del tablero s.
      */
     public int MinValor(GameStatus s, int alfa, int beta, int profundidad, CellType jugador){
-        if(profundidad == 0) return 0;
+        if(profundidad == 0) return Eval(s, jugador);
         CellType enemy;
         if(jugador == CellType.PLAYER1) enemy = CellType.PLAYER2;
         else enemy = CellType.PLAYER1;
@@ -126,7 +127,7 @@ public class LOAL implements IPlayer, IAuto {
      * @return El valor alfa más grande posible a partir del tablero s.
      */
     public int MaxValor(GameStatus s, int alfa, int beta, int profundidad, CellType jugador){
-        if(profundidad == 0) return 0;
+        if(profundidad == 0) return Eval(s, jugador);
 
         for (int i = 0; i < s.getNumberOfPiecesPerColor(jugador); i++) {
             // Cogemos la primera posición de la primera ficha
@@ -154,6 +155,10 @@ public class LOAL implements IPlayer, IAuto {
         return alfa;
     }
     
+    public int Eval(GameStatus s, CellType jugador){
+        return 0;
+    }
+
     /**
      * Ens avisa que hem de parar la cerca en curs perquè s'ha exhaurit el temps
      * de joc.
