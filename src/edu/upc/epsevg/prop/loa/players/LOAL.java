@@ -7,6 +7,7 @@ import edu.upc.epsevg.prop.loa.IPlayer;
 import edu.upc.epsevg.prop.loa.Move;
 import edu.upc.epsevg.prop.loa.SearchType;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -156,6 +157,27 @@ public class LOAL implements IPlayer, IAuto {
     }
     
     public int Eval(GameStatus s, CellType jugador){
+        
+        int qn = s.getNumberOfPiecesPerColor(jugador);
+        DisjointSet ds = new DisjointSet(qn);
+        
+        ArrayList<Point> pendingAmazons = new ArrayList<>();
+        for (int q = 0; q < qn; q++) pendingAmazons.add(s.getPiece(jugador, q));
+
+        for(int i = 0; i < pendingAmazons.size(); i++){
+            for(int j = 0; j < pendingAmazons.size(); j++){
+                // No hace falta realmente porque tenemos un set.
+                Point first = pendingAmazons.get(i);
+                Point second = pendingAmazons.get(j);
+                if(!first.equals(second)){
+                    if(first.distance(second) == 1){
+                        System.out.println(first + " => " + second);
+                        ds.Union(i, j);
+                    }
+                }
+            }
+        }
+        ds.printSet();
         return 0;
     }
 
