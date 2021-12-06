@@ -223,7 +223,7 @@ public class LOAL implements IPlayer, IAuto {
                 }
             }
         }
-        return 0;
+        return puntuarTablero(jugador, s, pendingAmazons, ds, ds.getNumberofDisjointSets());
     }
 
     /**
