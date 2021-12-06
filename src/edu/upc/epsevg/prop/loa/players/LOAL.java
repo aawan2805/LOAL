@@ -159,10 +159,14 @@ public class LOAL implements IPlayer, IAuto {
     public int Eval(GameStatus s, CellType jugador){
         
         int qn = s.getNumberOfPiecesPerColor(jugador);
-        DisjointSet ds = new DisjointSet(qn);
+        DisjointSet ds = new DisjointSet();
+        
         
         ArrayList<Point> pendingAmazons = new ArrayList<>();
-        for (int q = 0; q < qn; q++) pendingAmazons.add(s.getPiece(jugador, q));
+        for (int q = 0; q < qn; q++){
+            ds.create_set(q);
+            pendingAmazons.add(s.getPiece(jugador, q));
+        }
 
         for(int i = 0; i < pendingAmazons.size(); i++){
             for(int j = 0; j < pendingAmazons.size(); j++){
@@ -171,13 +175,11 @@ public class LOAL implements IPlayer, IAuto {
                 Point second = pendingAmazons.get(j);
                 if(!first.equals(second)){
                     if(first.distance(second) == 1){
-                        System.out.println(first + " => " + second);
-                        ds.Union(i, j);
+                        ds.union(i, j);
                     }
                 }
             }
         }
-        ds.printSet();
         return 0;
     }
 
