@@ -21,11 +21,13 @@ public class Game {
             @Override
             public void run() {
                 
-                //IPlayer player1 = new HumanPlayer("Octopus");
-                IPlayer player1 = new RandomPlayer("Random");
-                IPlayer player2 = new LOAL("LOAL");
+                IPlayer player1 = new MCCloudPlayer();
+                //IPlayer player1 = new BuckyPlayer(2);
+                //IPlayer player1 = new RandomPlayer("Random");
+                //IPlayer player1 = new HumanPlayer("españa");
+                IPlayer player2 = new LOAL("LOAL", 5);
                                 
-                new Board(player1 , player2, 4, Level.EASY);
+                new Board(player1 , player2, 60, Level.DIFFICULT);
              }
         });
     }
