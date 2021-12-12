@@ -1,5 +1,6 @@
 package edu.upc.epsevg.prop.loa.players;
 
+import edu.upc.epsevg.prop.loa.DisjointSet;
 import edu.upc.epsevg.prop.loa.CellType;
 import edu.upc.epsevg.prop.loa.GameStatus;
 import edu.upc.epsevg.prop.loa.IAuto;
@@ -72,10 +73,10 @@ public class LOAL implements IPlayer, IAuto {
                 GameStatus aux = new GameStatus(s);
                 // TODO: mov és pieza del adversario?
                 
-                if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
+                /*if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
                     //System.out.println("Hola");
                     continue;
-                }
+                }*/
                 // Movemos la ficha
                 aux.movePiece(posFicha, mov);
                 if(aux.isGameOver() && aux.GetWinner() == this.player){
@@ -124,9 +125,9 @@ public class LOAL implements IPlayer, IAuto {
             for(Point mov: s.getMoves(posFicha)){
                 GameStatus aux = new GameStatus(s);
                 // TODO: mov és pieza del adversario?
-                if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
+                /*if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
                     continue;
-                }
+                }*/
                 // Movemos la ficha, tener en cuenta si se come una ficha mía, eso me beneficia
                 aux.movePiece(posFicha, mov);
                 if(aux.isGameOver() && aux.GetWinner() == enemy){
@@ -165,9 +166,9 @@ public class LOAL implements IPlayer, IAuto {
             for(Point mov: s.getMoves(posFicha)){
                 GameStatus aux = new GameStatus(s);
                 // TODO: mov és pieza del adversario?
-                 if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
+                /*if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
                     continue;
-                }
+                }*/
                 // Movemos la ficha, tener en cuenta si se come una ficha mía, eso me beneficia
                 aux.movePiece(posFicha, mov);
                 if(aux.isGameOver() && aux.GetWinner() == jugador){
@@ -236,7 +237,7 @@ public class LOAL implements IPlayer, IAuto {
         }
 //        System.out.println(prueba);
         // System.out.println(valorMinimo);
-        int valorFinal = s.getNumberOfPiecesPerColor(jugador) - numeroSets + (100-valorMinimo) + (100-ValorMinimoMedio) + valorMatriz;
+        int valorFinal = 10 * (s.getNumberOfPiecesPerColor(jugador) - numeroSets) + (200-valorMinimo) + valorMatriz;
         //System.out.println(valorFinal);
         //System.out.println(" ");
         return valorFinal;
