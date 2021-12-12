@@ -31,9 +31,9 @@ public class ZobristHashing {
       this.hash = 0;
    }
 
-   public ZobristHashing(ZobristHashing var1) {
-      this.bitString = var1.bitString;
-      this.hash = var1.hash;
+   public ZobristHashing(ZobristHashing zh) {
+      this.bitString = zh.bitString;
+      this.hash = zh.hash;
    }
 
    public void reset() {
