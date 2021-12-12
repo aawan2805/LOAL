@@ -3,14 +3,17 @@ package edu.upc.epsevg.prop.loa.players;
 import edu.upc.epsevg.prop.loa.DisjointSet;
 import edu.upc.epsevg.prop.loa.CellType;
 import edu.upc.epsevg.prop.loa.GameStatus;
+import edu.upc.epsevg.prop.loa.HashInfo;
 import edu.upc.epsevg.prop.loa.IAuto;
 import edu.upc.epsevg.prop.loa.IPlayer;
 import edu.upc.epsevg.prop.loa.Move;
 import edu.upc.epsevg.prop.loa.SearchType;
+import edu.upc.epsevg.prop.loa.ZobristHashing;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import static java.lang.Thread.sleep;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -35,15 +38,21 @@ public class LOAL implements IPlayer, IAuto {
             {21,23,25,25,25,25,23,21},
             {21,23,23,23,23,23,23,21},
             {21,21,21,21,21,21,21,21}
-        };
+    };
+    HashMap<Integer, HashInfo> zh = new HashMap<>();
+    ZobristHashing zobrist;
+    
+    
     public LOAL(String name) {
         this.name = name;
+        zobrist = new ZobristHashing(2, 64);
     }
 
     public LOAL(String name, int profundidad){
         this.name = name;
         this.profundidad = profundidad;
         this.num_fichas_enemigas=0;
+        zobrist = new ZobristHashing(2, 64);
     }
 
     /**
@@ -55,6 +64,8 @@ public class LOAL implements IPlayer, IAuto {
      */
     @Override
     public Move move(GameStatus s) {
+        this.zobrist.reset();
+
         int Valor = Integer.MIN_VALUE;
         Point from = null;
         Point to = null;
@@ -117,12 +128,31 @@ public class LOAL implements IPlayer, IAuto {
             return Heuristica1-Heuristica2;
         }
         CellType enemy = CellType.opposite(jugador);
-
+        
         for (int i = 0; i < s.getNumberOfPiecesPerColor(enemy); i++) {
             // Cogemos la primera posición de la primera ficha
             Point posFicha = s.getPiece(enemy, i);
+            ArrayList<Point> moves = new ArrayList<>();
+            
+            boolean seguir = false;
+            int hashAux = zobrist.add(enemy, posFicha);
+            if(zh.containsKey(hashAux)){
+                HashInfo hI = zh.get(hashAux);
+                if(profundidad <= hI.profundidad) {
+                    System.out.println("Entrando ZH MAX");
+                    return hI.heuristica;
+                }
+                else {
+                    for(Point m: s.getMoves(posFicha)){
+                        if(m == hI.mejorMejorMovimientoFicha) moves.add(0, m);
+                        else moves.add(m);
+                    }                    
+                }
+            }
+
+            if(moves.size() < 1) moves = s.getMoves(posFicha);
             // Iteramos sobre sus posibles movimientos
-            for(Point mov: s.getMoves(posFicha)){
+            for(Point mov: moves){               
                 GameStatus aux = new GameStatus(s);
                 // TODO: mov és pieza del adversario?
                 /*if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
@@ -135,7 +165,14 @@ public class LOAL implements IPlayer, IAuto {
                     return Integer.MIN_VALUE;
                 }
                 beta = Math.min(beta, MaxValor(aux, alfa, beta, profundidad-1, jugador));
+
+                if(!seguir){
+                    HashInfo hI = new HashInfo(beta, profundidad, posFicha, mov);
+                    zh.put(hashAux, hI);
+                }
+                
                 if(beta <= alfa) return beta;
+
             }
         }
 
@@ -162,6 +199,25 @@ public class LOAL implements IPlayer, IAuto {
         for (int i = 0; i < s.getNumberOfPiecesPerColor(jugador); i++) {
             // Cogemos la primera posición de la primera ficha
             Point posFicha = s.getPiece(jugador, i);
+            ArrayList<Point> moves = new ArrayList<>();
+            
+            boolean seguir = false;
+            int hashAux = zobrist.add(jugador, posFicha);
+            if(zh.containsKey(hashAux)){
+                HashInfo hI = zh.get(hashAux);
+                if(profundidad <= hI.profundidad) {
+                    System.out.println("Entrando ZH MAX");
+                    return hI.heuristica;
+                }
+                else {
+                    for(Point m: s.getMoves(posFicha)){
+                        if(m == hI.mejorMejorMovimientoFicha) moves.add(0, m);
+                        else moves.add(m);
+                    }                    
+                }
+            }
+            
+            if(moves.size() < 1) moves = s.getMoves(posFicha);
             // Iteramos sobre sus posibles movimientos
             for(Point mov: s.getMoves(posFicha)){
                 GameStatus aux = new GameStatus(s);
@@ -176,6 +232,12 @@ public class LOAL implements IPlayer, IAuto {
                     return Integer.MAX_VALUE;
                 }
                 alfa = Math.max(alfa, MinValor(aux, alfa, beta, profundidad - 1, jugador));
+                
+                if(!seguir){
+                    HashInfo hI = new HashInfo(alfa, profundidad, posFicha, mov);
+                    zh.put(hashAux, hI);
+                }
+                
                 if(alfa >= beta) return alfa;
             }
         }
