@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.upc.epsevg.prop.loa.players;
+package edu.upc.epsevg.prop.loa;
 
 import java.awt.Point;
 import java.util.ArrayList;
