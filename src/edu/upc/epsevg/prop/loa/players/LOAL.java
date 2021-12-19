@@ -40,21 +40,30 @@ public class LOAL implements IPlayer, IAuto {
             {21,21,21,21,21,21,21,21}
     };
     HashMap<Integer, HashInfo> zh = new HashMap<>();
-    ZobristHashing zobrist;
+    int[][][] bitString = new int[8][8][2];
     
     
     public LOAL(String name) {
         this.name = name;
-        zobrist = new ZobristHashing(2, 64);
+        startZobrist();
     }
 
     public LOAL(String name, int profundidad){
         this.name = name;
         this.profundidad = profundidad;
         this.num_fichas_enemigas=0;
-        zobrist = new ZobristHashing(2, 64);
     }
-
+    
+    private void startZobrist(){
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                for (int k = 0; k < 2; k++) {
+                    bitString[i][j][k] = (int)((long)(Math.random() * Long.MAX_VALUE) & -1L);
+                }
+            }
+        }
+    }
+    
     /**
      * Decideix el moviment del jugador donat un tauler i un color de peça que
      * ha de posar.
