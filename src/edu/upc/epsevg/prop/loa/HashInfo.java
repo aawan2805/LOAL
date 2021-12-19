@@ -9,18 +9,21 @@ import java.awt.Point;
 
 /**
  *
- * @author Abdullah Bashir Yasmin, Marc Capdevila
+ * @author Abdullah Bashir Yasmin, Mario Konstanty Kochan
  */
+
 public class HashInfo {
     public int heuristica;
     public int profundidad;
-    public Point mejorFicha;
-    public Point mejorMejorMovimientoFicha;
+    public Point mejorMovimientoDesde;
+    public Point mejorMejorMovimientoA;
+    public CellType who;
 
-    public HashInfo(int heuristica, int profundidad, Point mejorFicha, Point mejorMejorMovimientoFicha) {
+    public HashInfo(int heuristica, int profundidad, Point mejorFicha, Point mejorMejorMovimientoFicha, CellType who) {
         this.heuristica = heuristica;
         this.profundidad = profundidad;
-        this.mejorFicha = mejorFicha;
-        this.mejorMejorMovimientoFicha = mejorMejorMovimientoFicha;
+        this.mejorMovimientoDesde = mejorFicha;
+        this.mejorMejorMovimientoA = mejorMejorMovimientoFicha;
+        this.who = who;
     }
 }
