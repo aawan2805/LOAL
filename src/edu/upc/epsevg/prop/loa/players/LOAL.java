@@ -336,6 +336,20 @@ public class LOAL implements IPlayer, IAuto {
         return puntuarTablero(jugador, s, pendingAmazons, ds, ds.getNumberofDisjointSets());
     }
     
+    /**
+     * Añade a la tabla de zobrist hash una entrada con la información.
+     * @param hash Zobrist hash a guardar
+     * @param profundidad Produnidad máxima llegada
+     * @param heuristica Heurística obtenida hasta la profunidad
+     * @param from Mejor movimiento desde
+     * @param to Mejor movimiento a
+     * @param player Jugador que ha realizado el movimiento
+     */
+    public void RecordHash(int hash, int profundidad, int heuristica, Point from, Point to, CellType player){
+        HashInfo hI = new HashInfo(heuristica, profundidad, from, to, player);
+        zh.put(hash, hI);
+    }
+
 //     public int Eval(GameStatus s, CellType jugador){
 //         int h=0;
 //         
