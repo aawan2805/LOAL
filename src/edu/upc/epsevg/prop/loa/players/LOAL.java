@@ -358,6 +358,26 @@ public class LOAL implements IPlayer, IAuto {
         HashInfo hI = new HashInfo(heuristica, profundidad, from, to, player);
         zh.put(hash, hI);
     }
+    
+    /**
+     * Calcula el hash dado el tablero s.
+     * @param s Tablero
+     * @return Zobrist Hash
+     */
+    private int hashBoard(GameStatus s) {
+        int hash = 0;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                CellType ficha = s.getPos(i, j);
+                if(ficha != CellType.EMPTY){
+                    int fichaNumero = CellType.toColor01(ficha);
+                    hash ^= bitString[i][j][fichaNumero];
+                }
+            }
+        }
+
+        return hash;
+    }
 
 //     public int Eval(GameStatus s, CellType jugador){
 //         int h=0;
