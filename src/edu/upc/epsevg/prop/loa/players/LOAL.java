@@ -30,6 +30,7 @@ public class LOAL implements IPlayer, IAuto {
     String name;
     CellType player;
     int profundidad = 3;
+    int nodosExplorados;
     static int num_fichas_enemigas;
     int matrix_valorcasilla[][] = new int[][] {
             {21,21,21,21,21,21,21,21},
@@ -75,28 +76,27 @@ public class LOAL implements IPlayer, IAuto {
      */
     @Override
     public Move move(GameStatus s) {
-        this.zobrist.reset();
+        zh.clear();
         
         int hash = hashBoard(s);
+        this.nodosExplorados = 0;
         
-        int Valor = Integer.MIN_VALUE;
+        this.player = s.getCurrentPlayer();
         Point from = null;
         Point to = null;
+        
+        int Valor = Integer.MIN_VALUE;
         boolean win = false;
-        this.player = s.getCurrentPlayer();
-        this.num_fichas_enemigas=8;
-        //s.getNumberOfPiecesPerColor(CellType.opposite(player));
-        CellType enemy = CellType.opposite(player);
-        //System.out.println("Entrando en el move");
+        
         // Recorremos el número de fichas que tenemos en la partida
         for (int i = 0; i < s.getNumberOfPiecesPerColor(this.player) && !win; i++) {
             // Cogemos la primera posición de la primera ficha
             Point posFicha = s.getPiece(this.player, i);
             // Iteramos sobre sus posibles movimientos
             for(Point mov: s.getMoves(posFicha)){
-                GameStatus aux = new GameStatus(s);
+                GameStatusAdvances aux = new GameStatusAdvances(s);
                 // TODO: mov és pieza del adversario?
-                
+
                 /*if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
                     //System.out.println("Hola");
                     continue;
@@ -119,9 +119,8 @@ public class LOAL implements IPlayer, IAuto {
                 }
             }
         }
-        
        // System.out.println("Saliendo en el move");
-        return new Move(from, to,0, this.profundidad, SearchType.RANDOM);
+        return new Move(from, to, this.nodosExplorados, this.profundidad, SearchType.RANDOM);
     }
 
     /**
