@@ -25,7 +25,7 @@ public class Game {
                 //IPlayer player1 = new BuckyPlayer(2);
                 //IPlayer player1 = new RandomPlayer("Random");
                 //IPlayer player1 = new HumanPlayer("españa");
-                IPlayer player2 = new LOAL("LOAL", 5);
+                IPlayer player2 = new LOAL(5);
                                 
                 new Board(player1 , player2, 60, Level.DIFFICULT);
              }
