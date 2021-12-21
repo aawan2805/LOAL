@@ -217,7 +217,7 @@ public class LOAL implements IPlayer, IAuto {
             
         }
                        
-        RecordHash(hash, prof, beta, 0, bestMoveFromZB, bestMoveToZB, enemy);
+        RecordHash(hash, prof, beta, bestMoveFromZB, bestMoveToZB, enemy);
         return beta;
     }
 
