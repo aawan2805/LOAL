@@ -74,7 +74,9 @@ public class LOAL implements IPlayer, IAuto {
     @Override
     public Move move(GameStatus s) {
         this.zobrist.reset();
-
+        
+        int hash = hashBoard(s);
+        
         int Valor = Integer.MIN_VALUE;
         Point from = null;
         Point to = null;
@@ -107,7 +109,7 @@ public class LOAL implements IPlayer, IAuto {
                     break;
                 }
                 // TODO: Check if is solution
-                int x = MinValor(aux, Integer.MIN_VALUE, Integer.MAX_VALUE, this.profundidad-1, this.player);
+                int x = MinValor(aux, Integer.MIN_VALUE, Integer.MAX_VALUE, this.profundidad-1, this.player, hash);
                 if(x >= Valor){
                     from = posFicha;
                     to = mov;
@@ -127,9 +129,10 @@ public class LOAL implements IPlayer, IAuto {
      * @param beta Valor heurístico más pequeño hasta el momento
      * @param profundidad Profundidad máxima a explorar
      * @param jugador Ficha del jugador (O ó @)
+     * @param hash Zobrist Hash del tablero s
      * @return El valor beta más pequeño posible a partir del tablero s.
      */
-    public int MinValor(GameStatus s, int alfa, int beta, int profundidad, CellType jugador){
+    public int MinValor(GameStatus s, int alfa, int beta, int profundidad, CellType jugador, int hash){
          if(profundidad == 0){
             int Heuristica1 =  Eval(s, jugador);
             int Heuristica2 = Eval(s, CellType.opposite(jugador));
@@ -195,9 +198,10 @@ public class LOAL implements IPlayer, IAuto {
      * @param beta Valor heurístico más pequeño hasta el momento
      * @param profundidad Profundidad máxima a explorar
      * @param jugador Ficha del jugador (O ó @)
+     * @param hash Zobrist Hash del tablero s
      * @return El valor alfa más grande posible a partir del tablero s.
      */
-    public int MaxValor(GameStatus s, int alfa, int beta, int profundidad, CellType jugador){
+    public int MaxValor(GameStatus s, int alfa, int beta, int profundidad, CellType jugador, int hash){
         if(profundidad == 0){
             int Heuristica1 =  Eval(s, jugador);
             int Heuristica2 = Eval(s, CellType.opposite(jugador));
@@ -240,7 +244,7 @@ public class LOAL implements IPlayer, IAuto {
                     // Vamos bien!
                     return Integer.MAX_VALUE;
                 }
-                alfa = Math.max(alfa, MinValor(aux, alfa, beta, profundidad - 1, jugador));
+                alfa = Math.max(alfa, MinValor(aux, alfa, beta, profundidad - 1, jugador, hash));
                 
                 if(!seguir){
                     HashInfo hI = new HashInfo(alfa, profundidad, posFicha, mov);
