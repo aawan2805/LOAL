@@ -3,6 +3,7 @@ package edu.upc.epsevg.prop.loa.players;
 import edu.upc.epsevg.prop.loa.DisjointSet;
 import edu.upc.epsevg.prop.loa.CellType;
 import edu.upc.epsevg.prop.loa.GameStatus;
+import edu.upc.epsevg.prop.loa.GameStatusAdvances;
 import edu.upc.epsevg.prop.loa.HashInfo;
 import edu.upc.epsevg.prop.loa.IAuto;
 import edu.upc.epsevg.prop.loa.IPlayer;
@@ -13,6 +14,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import static java.lang.Thread.sleep;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -132,7 +134,7 @@ public class LOAL implements IPlayer, IAuto {
      * @param hash Zobrist Hash del tablero s
      * @return El valor beta más pequeño posible a partir del tablero s.
      */
-    public int MinValor(GameStatus s, int alfa, int beta, int profundidad, CellType jugador, int hash){
+    public int MinValor(GameStatusAdvances s, int alfa, int beta, int prof, CellType jugador, int hash){
          if(profundidad == 0){
             int Heuristica1 =  Eval(s, jugador);
             int Heuristica2 = Eval(s, CellType.opposite(jugador));
@@ -141,53 +143,81 @@ public class LOAL implements IPlayer, IAuto {
         }
         CellType enemy = CellType.opposite(jugador);
         
+        Point bestMoveFrom = null; 
+        Point bestMoveTo = null;
+        boolean foundMovimientos = true;
+        
+        Point bestMoveFromZB = null;
+        Point bestMoveToZB = null;
+        
+        ArrayList<Point> froms = new ArrayList<>();
         for (int i = 0; i < s.getNumberOfPiecesPerColor(enemy); i++) {
-            // Cogemos la primera posición de la primera ficha
-            Point posFicha = s.getPiece(enemy, i);
-            ArrayList<Point> moves = new ArrayList<>();
+            froms.add(s.getPiece(enemy, i));
+        }
+        // Tablero ya analizado?
+        if(zh.containsKey(hash)){
+            HashInfo hI = zh.get(hash);
             
-            boolean seguir = false;
-            int hashAux = zobrist.add(enemy, posFicha);
-            if(zh.containsKey(hashAux)){
-                HashInfo hI = zh.get(hashAux);
-                if(profundidad <= hI.profundidad) {
-                    System.out.println("Entrando ZH MAX");
-                    return hI.heuristica;
-                }
-                else {
-                    for(Point m: s.getMoves(posFicha)){
-                        if(m == hI.mejorMejorMovimientoFicha) moves.add(0, m);
-                        else moves.add(m);
-                    }                    
-                }
-            }
+            if(hI.who == enemy){
+                bestMoveFrom = hI.mejorMovimientoDesde;
+                bestMoveTo = hI.mejorMejorMovimientoA;
 
-            if(moves.size() < 1) moves = s.getMoves(posFicha);
-            // Iteramos sobre sus posibles movimientos
-            for(Point mov: moves){               
-                GameStatus aux = new GameStatus(s);
-                // TODO: mov és pieza del adversario?
-                /*if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
-                    continue;
-                }*/
-                // Movemos la ficha, tener en cuenta si se come una ficha mía, eso me beneficia
-                aux.movePiece(posFicha, mov);
-                if(aux.isGameOver() && aux.GetWinner() == enemy){
-                    // Vamos mal!
-                    return Integer.MIN_VALUE;
+                int indexFrom = froms.indexOf(bestMoveFrom);
+                if(indexFrom == -1) {
+                    foundMovimientos = false;
+                } else {
+                    Collections.swap(froms, indexFrom, 0);
                 }
-                beta = Math.min(beta, MaxValor(aux, alfa, beta, profundidad-1, jugador));
-
-                if(!seguir){
-                    HashInfo hI = new HashInfo(beta, profundidad, posFicha, mov);
-                    zh.put(hashAux, hI);
-                }
-                
-                if(beta <= alfa) return beta;
-
+            } else {
+                System.out.println("COLISIÓN min " + jugador);
             }
         }
+        
+        //TreeMap<Integer, List<Point>> bestMove = new TreeMap<>();
+        
+        for (Point posFicha: froms) {
+            ArrayList<Point> moves = s.getMoves(posFicha);
+            
+            if(bestMoveFrom != null && posFicha == bestMoveFrom && foundMovimientos){
+                int indexBestMoveTo = moves.indexOf(bestMoveTo);
+                if(indexBestMoveTo != -1){
+                    Collections.swap(moves, indexBestMoveTo, 0);
+                }
+            } else {
+                moves = s.getMoves(posFicha);
+            }
+            // Iteramos sobre sus posibles movimientos
+            for(Point mov: moves){               
+                GameStatusAdvances aux = new GameStatusAdvances(s);
 
+                int bitStringFrom = bitString[posFicha.x][posFicha.y][CellType.toColor01(enemy)];
+                int bitStringTo = bitString[mov.x][mov.y][CellType.toColor01(enemy)];
+                int eatPiecePos = bitString[mov.x][mov.y][CellType.toColor01(jugador)];
+                int newHash = aux.movePiece(posFicha, mov, hash, bitStringFrom, bitStringTo, s.getPos(mov) == jugador, eatPiecePos);
+                
+                if(aux.isGameOver() && aux.GetWinner() == enemy){
+                    // Vamos mal!
+                    beta = Integer.MIN_VALUE;
+                    bestMoveFromZB = posFicha;
+                    bestMoveToZB = mov;
+                } else {
+                    // If < que beta
+                    int valor = MaxValor(aux, alfa, beta, prof-1, jugador, newHash);
+                    if(valor < beta){
+                        beta = valor;
+                        bestMoveFromZB = posFicha;
+                        bestMoveToZB = mov;
+                    }
+                }
+
+                if(beta <= alfa){
+                    return beta;
+                }
+            }
+            
+        }
+                       
+        RecordHash(hash, prof, beta, 0, bestMoveFromZB, bestMoveToZB, enemy);
         return beta;
     }
 
