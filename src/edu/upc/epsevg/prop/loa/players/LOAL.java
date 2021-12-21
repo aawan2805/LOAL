@@ -124,7 +124,7 @@ public class LOAL implements IPlayer, IAuto {
      * @return El valor beta más pequeño posible a partir del tablero s.
      */
     public int MinValor(GameStatusAdvances s, int alfa, int beta, int prof, CellType jugador, int hash){
-        if(profundidad == 0){
+        if(prof == 0){
             int Heuristica1 =  Eval(s, jugador);
             int Heuristica2 = Eval(s, CellType.opposite(jugador));
            // System.out.println(Heuristica1 + " " + Heuristica2 + " valor total " + (Heuristica1-Heuristica2));
@@ -219,8 +219,10 @@ public class LOAL implements IPlayer, IAuto {
      * @param hash Zobrist Hash del tablero s
      * @return El valor alfa más grande posible a partir del tablero s.
      */
-    public int MaxValor(GameStatus s, int alfa, int beta, int prof, CellType jugador, int hash){
-        if(profundidad == 0){
+    public int MaxValor(GameStatusAdvances s, int alfa, int beta, int prof, CellType jugador, int hash){
+        if(prof == 0){
+            this.nodosExplorados++;
+            
             int Heuristica1 =  Eval(s, jugador);
             int Heuristica2 = Eval(s, CellType.opposite(jugador));
             return Heuristica1-Heuristica2;
@@ -325,6 +327,7 @@ public class LOAL implements IPlayer, IAuto {
      */
     public int puntuarTablero(CellType jugador, GameStatus s, ArrayList<Point> pendingAmazons, DisjointSet ds,  int numeroSets){
         int valorMinimo=0;
+        //System.out.println(s);
         int[] distanciaMinima = new int[numeroSets];
         for (int i = 0; i < numeroSets; i++) {
             distanciaMinima[i] = -1;
@@ -374,8 +377,11 @@ public class LOAL implements IPlayer, IAuto {
             Matrix = s.getPiece(jugador, i);
             valorMatriz+=matrix_valorcasilla[Matrix.x][Matrix.y];
         }
-
-        int valorFinal = 10 * (s.getNumberOfPiecesPerColor(jugador) - numeroSets) + (200-valorMinimo) + valorMatriz;
+//        System.out.println(prueba);
+        // System.out.println(valorMinimo);
+        int valorFinal = 10 * (s.getNumberOfPiecesPerColor(jugador) - numeroSets) + (200-valorMinimo) + 2*(valorMatriz);
+        //System.out.println(valorFinal);
+        //System.out.println(" ");
         return valorFinal;
     }
     
