@@ -46,15 +46,10 @@ public class LOAL implements IPlayer, IAuto {
     int[][][] bitString = new int[8][8][2];
     
     
-    public LOAL(String name) {
-        this.name = name;
+    public LOAL(int prof){
         startZobrist();
-    }
-
-    public LOAL(String name, int profundidad){
-        this.name = name;
-        this.profundidad = profundidad;
-        this.num_fichas_enemigas=0;
+        this.nodosExplorados = 0;
+        this.profundidad = prof;
     }
     
     private void startZobrist(){
