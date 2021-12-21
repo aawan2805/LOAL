@@ -52,6 +52,9 @@ public class LOAL implements IPlayer, IAuto {
         this.profundidad = prof;
     }
     
+    /**
+     * Incializa la matriz para tener valores random seguros, de esta forma asegurar que la hash será única.
+     */
     private void startZobrist(){
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
