@@ -362,7 +362,7 @@ public class LOAL implements IPlayer, IAuto {
     /**
      * Calcula el hash dado el tablero s.
      * @param s Tablero
-     * @return Zobrist Hash
+     * @return Zobrist Hash para tablero s.
      */
     private int hashBoard(GameStatus s) {
         int hash = 0;
