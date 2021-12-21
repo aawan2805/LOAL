@@ -85,18 +85,10 @@ public class LOAL implements IPlayer, IAuto {
         
         // Recorremos el número de fichas que tenemos en la partida
         for (int i = 0; i < s.getNumberOfPiecesPerColor(this.player) && !win; i++) {
-            // Cogemos la primera posición de la primera ficha
             Point posFicha = s.getPiece(this.player, i);
-            // Iteramos sobre sus posibles movimientos
             for(Point mov: s.getMoves(posFicha)){
                 GameStatusAdvances aux = new GameStatusAdvances(s);
-                // TODO: mov és pieza del adversario?
 
-                /*if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
-                    //System.out.println("Hola");
-                    continue;
-                }*/
-                // Movemos la ficha
                 aux.movePiece(posFicha, mov);
                 if(aux.isGameOver() && aux.GetWinner() == this.player){
                     // Hemos ganado
@@ -114,7 +106,7 @@ public class LOAL implements IPlayer, IAuto {
                 }
             }
         }
-       // System.out.println("Saliendo en el move");
+
         return new Move(from, to, this.nodosExplorados, this.profundidad, SearchType.RANDOM);
     }
 
@@ -123,13 +115,13 @@ public class LOAL implements IPlayer, IAuto {
      * @param s Estado del juego (tablero)
      * @param alfa Valor heurístico más grande hasta el momento
      * @param beta Valor heurístico más pequeño hasta el momento
-     * @param profundidad Profundidad máxima a explorar
+     * @param prof Profundidad máxima a explorar
      * @param jugador Ficha del jugador (O ó @)
      * @param hash Zobrist Hash del tablero s
      * @return El valor beta más pequeño posible a partir del tablero s.
      */
     public int MinValor(GameStatusAdvances s, int alfa, int beta, int prof, CellType jugador, int hash){
-         if(profundidad == 0){
+        if(profundidad == 0){
             int Heuristica1 =  Eval(s, jugador);
             int Heuristica2 = Eval(s, CellType.opposite(jugador));
            // System.out.println(Heuristica1 + " " + Heuristica2 + " valor total " + (Heuristica1-Heuristica2));
@@ -148,7 +140,8 @@ public class LOAL implements IPlayer, IAuto {
         for (int i = 0; i < s.getNumberOfPiecesPerColor(enemy); i++) {
             froms.add(s.getPiece(enemy, i));
         }
-        // Tablero ya analizado?
+
+        // ========= Zobrist ========== //
         if(zh.containsKey(hash)){
             HashInfo hI = zh.get(hash);
             
@@ -166,8 +159,7 @@ public class LOAL implements IPlayer, IAuto {
                 System.out.println("COLISIÓN min " + jugador);
             }
         }
-        
-        //TreeMap<Integer, List<Point>> bestMove = new TreeMap<>();
+        // ========= Zobrist ========== //
         
         for (Point posFicha: froms) {
             ArrayList<Point> moves = s.getMoves(posFicha);
@@ -195,7 +187,6 @@ public class LOAL implements IPlayer, IAuto {
                     bestMoveFromZB = posFicha;
                     bestMoveToZB = mov;
                 } else {
-                    // If < que beta
                     int valor = MaxValor(aux, alfa, beta, prof-1, jugador, newHash);
                     if(valor < beta){
                         beta = valor;
@@ -220,7 +211,7 @@ public class LOAL implements IPlayer, IAuto {
      * @param s Estado del juego (tablero)
      * @param alfa Valor heurístico más grande hasta el momento
      * @param beta Valor heurístico más pequeño hasta el momento
-     * @param profundidad Profundidad máxima a explorar
+     * @param prof Profundidad máxima a explorar
      * @param jugador Ficha del jugador (O ó @)
      * @param hash Zobrist Hash del tablero s
      * @return El valor alfa más grande posible a partir del tablero s.
@@ -229,7 +220,6 @@ public class LOAL implements IPlayer, IAuto {
         if(profundidad == 0){
             int Heuristica1 =  Eval(s, jugador);
             int Heuristica2 = Eval(s, CellType.opposite(jugador));
-           // System.out.println(Heuristica1 + " " + Heuristica2 + " valor total " + (Heuristica1-Heuristica2));
             return Heuristica1-Heuristica2;
         }
         CellType enemy = CellType.opposite(jugador);
@@ -245,6 +235,7 @@ public class LOAL implements IPlayer, IAuto {
             froms.add(s.getPiece(jugador, i));
         }
         
+        // ========= Zobrist ========== //
         if(zh.containsKey(hash)){
             HashInfo hI = zh.get(hash);
                         
@@ -263,9 +254,10 @@ public class LOAL implements IPlayer, IAuto {
                 System.out.println("COLISIÓN MAX" + enemy);
             }
         }
+        // ========= Zobrist ========== //
         
         boolean maxValFound = false;
-        // ========= Zobrist ========== //
+
         for (Point posFicha: froms) {
             if(maxValFound) break;
             
@@ -319,9 +311,17 @@ public class LOAL implements IPlayer, IAuto {
         return alfa;
     }
     
+    /**
+     * Da una puntuación al tablero teniendo en cuenta los grupos y las distancias mínimas entre ellos.
+     * @param jugador Ficha del jugador (O ó @) (PLAYER1 o PLAYER2)
+     * @param s Tablero
+     * @param pendingAmazons Lista con las posiciones de las fichas para el jugador en el tablero s
+     * @param ds Grupos de fichas del jugador en el tablero s
+     * @param numeroSets Número de grupos
+     * @return Puntuación para el tablero s
+     */
     public int puntuarTablero(CellType jugador, GameStatus s, ArrayList<Point> pendingAmazons, DisjointSet ds,  int numeroSets){
         int valorMinimo=0;
-        //System.out.println(s);
         int[] distanciaMinima = new int[numeroSets];
         for (int i = 0; i < numeroSets; i++) {
             distanciaMinima[i] = -1;
@@ -371,42 +371,39 @@ public class LOAL implements IPlayer, IAuto {
             Matrix = s.getPiece(jugador, i);
             valorMatriz+=matrix_valorcasilla[Matrix.x][Matrix.y];
         }
-//        System.out.println(prueba);
-        // System.out.println(valorMinimo);
+
         int valorFinal = 10 * (s.getNumberOfPiecesPerColor(jugador) - numeroSets) + (200-valorMinimo) + valorMatriz;
-        //System.out.println(valorFinal);
-        //System.out.println(" ");
         return valorFinal;
     }
     
-    
+    /**
+     * Calcula la heurística para el tablero s y el jugador.
+     * @param s Tablero del juego
+     * @param jugador Player1 o Player2
+     * @return Heurística para el tablero s y el jugador.
+     */
     public int Eval(GameStatus s, CellType jugador) {
-        //System.out.println("entrando");
         int qn = s.getNumberOfPiecesPerColor(jugador);
-        // System.out.println(jugador);
         DisjointSet ds = new DisjointSet();
         ArrayList<Point> pendingAmazons = new ArrayList<>();
+
         for (int q = 0; q < qn; q++) {
             ds.create_set(q);
             pendingAmazons.add(s.getPiece(jugador, q));
         }
+        
         for (int i = 0; i < pendingAmazons.size(); i++) {
             for (int j = 0; j < pendingAmazons.size(); j++) {
-                // No hace falta realmente porque tenemos un set.
                 Point first = pendingAmazons.get(i);
                 Point second = pendingAmazons.get(j);
                 if (!first.equals(second)) {
                     if (first.distance(second) == 1) {
-                        // System.out.println(first + " -> " + second);
-                        // System.out.println(i + " " + j);
                         ds.union(i, j);
                     }
                 }
             }
         }
-        //System.out.println(ds.getNumberofDisjointSets());
        
-       //System.out.println("saliendo");
         return puntuarTablero(jugador, s, pendingAmazons, ds, ds.getNumberofDisjointSets());
     }
     
@@ -444,35 +441,6 @@ public class LOAL implements IPlayer, IAuto {
         return hash;
     }
 
-//     public int Eval(GameStatus s, CellType jugador){
-//         int h=0;
-//         
-//                 for (int[] dir : direcciones) {
-//                    int dirX = dir[0];
-//                    int dirY = dir[1];
-//                     h += calcularCasilla(i , j, s, jugador, dirX, dirY);   
-//                 }
-//    }
-//     
-//     
-//   public int calcularCasilla(int fila, int columna, GameStatus s, CellType jugador,int dirX,int dirY) {
-//       int numero = 0; 
-//       if((fila>=1 && dirX == -1) || (fila<=s.getSize()-1 && dirX== 1)){
-//           if((columna>=1 && dirY == -1) || (columna<=s.getSize()-1 && dirY== 1)){
-//               if(s.getPos(fila+dirX,columna+dirY) == jugador) numero+=1;
-//               else if(s.getPos(fila+dirX,columna+dirY) != jugador) numero-=1;
-//           }
-//           else{
-//               if(s.getPos(fila+dirX,columna) == jugador) numero+=1;
-//               else if(s.getPos(fila+dirX,columna) != jugador) numero-=1;
-//           }
-//       }
-//       else if((columna>=1 && dirY == -1) || (columna<=s.getSize()-1 && dirY== 1)){
-//           if(s.getPos(fila,columna+dirY) == jugador) numero+=1;
-//               else if(s.getPos(fila,columna+dirY) != jugador) numero-=1;
-//       }
-//       return numero;
-//   }
 
     /**
      * Ens avisa que hem de parar la cerca en curs perquè s'ha exhaurit el temps
