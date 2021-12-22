@@ -44,6 +44,7 @@ public class LOAL implements IPlayer, IAuto {
     };
     HashMap<Integer, HashInfo> zhPlayer = new HashMap<>();
     HashMap<Integer, HashInfo> zhEnemy = new HashMap<>();
+    ArrayList<Integer> historialPartida = new ArrayList<>(); // Para evitar los ciclos
     int[][][] bitString = new int[8][8][2];
     
     
