@@ -428,7 +428,7 @@ public class LOAL implements IPlayer, IAuto {
      * @param player Jugador que ha realizado el movimiento
      */
     public void RecordHash(int hash, int profundidad, int heuristica, Point from, Point to, CellType player){
-        HashInfo hI = new HashInfo(heuristica, profundidad, from, to, player);
+        HashInfo hI = new HashInfo(heuristica, profundidad, from, to);
         if(player == this.player) zhPlayer.put(hash, hI);
         else zhEnemy.put(hash, hI);
     }
