@@ -17,13 +17,11 @@ public class HashInfo {
     public int profundidad;
     public Point mejorMovimientoDesde;
     public Point mejorMejorMovimientoA;
-    public CellType who;
 
-    public HashInfo(int heuristica, int profundidad, Point mejorFicha, Point mejorMejorMovimientoFicha, CellType who) {
+    public HashInfo(int heuristica, int profundidad, Point mejorFicha, Point mejorMejorMovimientoFicha) {
         this.heuristica = heuristica;
         this.profundidad = profundidad;
         this.mejorMovimientoDesde = mejorFicha;
         this.mejorMejorMovimientoA = mejorMejorMovimientoFicha;
-        this.who = who;
     }
 }
