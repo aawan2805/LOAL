@@ -27,7 +27,7 @@ public class Game {
                 //IPlayer player1 = new HumanPlayer("españa");
                 IPlayer player2 = new LOAL(4);
                                 
-                new Board(player1 , player2, 60, Level.DIFFICULT);
+                new Board(player2 , player1, 60, Level.DIFFICULT);
              }
         });
     }

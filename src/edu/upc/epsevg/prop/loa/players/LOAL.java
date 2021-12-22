@@ -67,6 +67,7 @@ public class LOAL implements IPlayer, IAuto {
         }
     }
     
+    
     /**
      * Decideix el moviment del jugador donat un tauler i un color de peça que
      * ha de posar.
@@ -88,6 +89,8 @@ public class LOAL implements IPlayer, IAuto {
         
         int Valor = Integer.MIN_VALUE;
         boolean win = false;
+                        
+        CellType enemy = CellType.opposite(this.player);
         
         // Recorremos el número de fichas que tenemos en la partida
         for (int i = 0; i < s.getNumberOfPiecesPerColor(this.player) && !win; i++) {
@@ -95,16 +98,28 @@ public class LOAL implements IPlayer, IAuto {
             for(Point mov: s.getMoves(posFicha)){
                 GameStatusAdvances aux = new GameStatusAdvances(s);
                 
-                aux.movePiece(posFicha, mov);
+                int bitStringFrom = bitString[posFicha.x][posFicha.y][CellType.toColor01(this.player)];
+                int bitStringTo = bitString[mov.x][mov.y][CellType.toColor01(this.player)];
+                int eatPiecePos = bitString[mov.x][mov.y][CellType.toColor01(enemy)];
+                int newHash = aux.movePiece(posFicha, mov, hash, bitStringFrom, bitStringTo, aux.getPos(mov) == this.player, eatPiecePos);
+                
+                // Añadimos el movimiento, para que evitar ciclos
+                historialPartida.add(0, newHash);
+                
                 if(aux.isGameOver() && aux.GetWinner() == this.player){
                     // Hemos ganado
                     from = posFicha;
                     to = mov;
                     win = true;
+                    historialPartida.remove(0);
                     break;
                 }
                 // TODO: Check if is solution
                 int x = MinValor(aux, Integer.MIN_VALUE, Integer.MAX_VALUE, this.profundidad-1, this.player, hash);
+                
+                // Quitamos el movimiento.
+                historialPartida.remove(0);
+                
                 if(x >= Valor){
                     from = posFicha;
                     to = mov;
@@ -112,10 +127,23 @@ public class LOAL implements IPlayer, IAuto {
                 }
             }
         }
-
+        
         return new Move(from, to, this.nodosExplorados, this.profundidad, SearchType.RANDOM);
     }
-
+    
+    /**
+     * Comprueba si el hash existe en la lista.
+     * @param lista Lista en la cual buscar
+     * @param hash Valor a buscar en la lista
+     * @return True si existe o False si no existe
+     */
+    public boolean checkIfExistInList(ArrayList<Integer> lista, int hash){
+        for (int i = 0; i < lista.size(); i++) {
+            if(lista.get(i) == hash) return true;
+        }
+        return false;
+    }
+    
     /**
      *
      * @param s Estado del juego (tablero)
@@ -181,8 +209,13 @@ public class LOAL implements IPlayer, IAuto {
 
                 int bitStringFrom = bitString[posFicha.x][posFicha.y][CellType.toColor01(enemy)];
                 int bitStringTo = bitString[mov.x][mov.y][CellType.toColor01(enemy)];
-                int eatPiecePos = bitString[mov.x][mov.y][CellType.toColor01(jugador)];
+                int eatPiecePos = bitString[mov.x][mov.y][CellType.toColor01(jugador)];                
                 int newHash = aux.movePiece(posFicha, mov, hash, bitStringFrom, bitStringTo, s.getPos(mov) == jugador, eatPiecePos);
+                
+                // Tenemos un ciclo
+                if(historialPartida.contains(newHash)){
+                    continue;
+                }
                 
                 if(aux.isGameOver() && aux.GetWinner() == enemy){
                     // Vamos mal!
@@ -284,6 +317,11 @@ public class LOAL implements IPlayer, IAuto {
                 int bitStringTo = bitString[mov.x][mov.y][CellType.toColor01(jugador)];
                 int eatPiecePos = bitString[mov.x][mov.y][CellType.toColor01(enemy)];
                 int newHash = aux.movePiece(posFicha, mov, hash, bitStringFrom, bitStringTo, s.getPos(mov) == enemy, eatPiecePos);
+                
+                // Tenemos un ciclo
+                if(historialPartida.contains(newHash)){
+                    continue;
+                }
                 
                 if(aux.isGameOver() && aux.GetWinner() == jugador){
                     // Vamos bien!
