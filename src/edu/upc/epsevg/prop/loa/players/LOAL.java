@@ -147,8 +147,8 @@ public class LOAL implements IPlayer, IAuto {
         }
 
         // ========= Zobrist ========== //
-        if(zh.containsKey(hash)){
-            HashInfo hI = zh.get(hash);
+        if(zhEnemy.containsKey(hash)){
+            HashInfo hI = zhEnemy.get(hash);
             
             if(hI.who == enemy){
                 bestMoveFrom = hI.mejorMovimientoDesde;
@@ -243,8 +243,8 @@ public class LOAL implements IPlayer, IAuto {
         }
         
         // ========= Zobrist ========== //
-        if(zh.containsKey(hash)){
-            HashInfo hI = zh.get(hash);
+        if(zhPlayer.containsKey(hash)){
+            HashInfo hI = zhPlayer.get(hash);
                         
             if(hI.who == jugador){           
                 bestMoveFrom = hI.mejorMovimientoDesde;
