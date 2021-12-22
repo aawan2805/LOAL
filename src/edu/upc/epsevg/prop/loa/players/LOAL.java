@@ -150,19 +150,16 @@ public class LOAL implements IPlayer, IAuto {
         if(zhEnemy.containsKey(hash)){
             HashInfo hI = zhEnemy.get(hash);
             
-            if(hI.who == enemy){
-                bestMoveFrom = hI.mejorMovimientoDesde;
-                bestMoveTo = hI.mejorMejorMovimientoA;
+            bestMoveFrom = hI.mejorMovimientoDesde;
+            bestMoveTo = hI.mejorMejorMovimientoA;
 
-                int indexFrom = froms.indexOf(bestMoveFrom);
-                if(indexFrom == -1) {
-                    foundMovimientos = false;
-                } else {
-                    Collections.swap(froms, indexFrom, 0);
-                }
+            int indexFrom = froms.indexOf(bestMoveFrom);
+            if(indexFrom == -1) {
+                foundMovimientos = false;
             } else {
-                System.out.println("COLISIÓN min " + jugador);
+                Collections.swap(froms, indexFrom, 0);
             }
+            
         }
         // ========= Zobrist ========== //
         
@@ -246,20 +243,16 @@ public class LOAL implements IPlayer, IAuto {
         if(zhPlayer.containsKey(hash)){
             HashInfo hI = zhPlayer.get(hash);
                         
-            if(hI.who == jugador){           
-                bestMoveFrom = hI.mejorMovimientoDesde;
-                bestMoveTo = hI.mejorMejorMovimientoA;
+            bestMoveFrom = hI.mejorMovimientoDesde;
+            bestMoveTo = hI.mejorMejorMovimientoA;
 
-                int indexFrom = froms.indexOf(bestMoveFrom);
-                if(indexFrom == -1) {
-                    foundMovimientos = false;
-                } else {
-                    Collections.swap(froms, indexFrom, 0);
-                }
+            int indexFrom = froms.indexOf(bestMoveFrom);
+            if(indexFrom == -1) {
+                foundMovimientos = false;
+            } else {
+                Collections.swap(froms, indexFrom, 0);
             }
-            else{
-                System.out.println("COLISIÓN MAX" + enemy);
-            }
+            
         }
         // ========= Zobrist ========== //
         
