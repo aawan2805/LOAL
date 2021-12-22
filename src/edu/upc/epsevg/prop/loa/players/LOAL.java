@@ -42,7 +42,8 @@ public class LOAL implements IPlayer, IAuto {
             {21,23,23,23,23,23,23,21},
             {21,21,21,21,21,21,21,21}
     };
-    HashMap<Integer, HashInfo> zh = new HashMap<>();
+    HashMap<Integer, HashInfo> zhPlayer = new HashMap<>();
+    HashMap<Integer, HashInfo> zhEnemy = new HashMap<>();
     int[][][] bitString = new int[8][8][2];
     
     
@@ -74,7 +75,8 @@ public class LOAL implements IPlayer, IAuto {
      */
     @Override
     public Move move(GameStatus s) {
-        zh.clear();
+        zhPlayer.clear();
+        zhEnemy.clear();
         
         int hash = hashBoard(s);
         this.nodosExplorados = 0;
