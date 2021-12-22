@@ -93,7 +93,7 @@ public class LOAL implements IPlayer, IAuto {
             Point posFicha = s.getPiece(this.player, i);
             for(Point mov: s.getMoves(posFicha)){
                 GameStatusAdvances aux = new GameStatusAdvances(s);
-
+                
                 aux.movePiece(posFicha, mov);
                 if(aux.isGameOver() && aux.GetWinner() == this.player){
                     // Hemos ganado

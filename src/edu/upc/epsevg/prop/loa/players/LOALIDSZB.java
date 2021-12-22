@@ -44,7 +44,8 @@ public class LOALIDSZB implements IPlayer, IAuto {
             {21,23,23,23,23,23,23,21},
             {21,21,21,21,21,21,21,21}
     };
-    HashMap<Integer, HashInfo> zh = new HashMap<>();
+    HashMap<Integer, HashInfo> zhPlayer = new HashMap<>();
+    HashMap<Integer, HashInfo> zhEnemy = new HashMap<>();
     int[][][] bitString = new int[8][8][2];
     
     
@@ -75,8 +76,9 @@ public class LOALIDSZB implements IPlayer, IAuto {
      */
     @Override
     public Move move(GameStatus s) {
-        zh.clear();
-        
+        zhPlayer.clear();
+        zhEnemy.clear();
+
         this.timeout = false;
         
         int hash = hashBoard(s);
@@ -285,26 +287,21 @@ public class LOALIDSZB implements IPlayer, IAuto {
             froms.add(s.getPiece(jugador, i));
         }
         
-        if(zh.containsKey(hash)){
-            HashInfo hI = zh.get(hash);
+        if(zhPlayer.containsKey(hash)){
+            HashInfo hI = zhPlayer.get(hash);
                         
-            if(hI.who == jugador){
-                if(hI.profundidad >= prof) {
-                    return hI.heuristica;
-                }
-            
-                bestMoveFrom = hI.mejorMovimientoDesde;
-                bestMoveTo = hI.mejorMejorMovimientoA;
-
-                int indexFrom = froms.indexOf(bestMoveFrom);
-                if(indexFrom == -1) {
-                    foundMovimientos = false;
-                } else {
-                    Collections.swap(froms, indexFrom, 0);
-                }
+            if(hI.profundidad >= prof) {
+                return hI.heuristica;
             }
-            else{
-                //System.out.println("COLISIÓN MAX" + jugador);
+
+            bestMoveFrom = hI.mejorMovimientoDesde;
+            bestMoveTo = hI.mejorMejorMovimientoA;
+
+            int indexFrom = froms.indexOf(bestMoveFrom);
+            if(indexFrom == -1) {
+                foundMovimientos = false;
+            } else {
+                Collections.swap(froms, indexFrom, 0);
             }
         }
         
@@ -378,8 +375,9 @@ public class LOALIDSZB implements IPlayer, IAuto {
      * @param player Jugador que ha realizado el movimiento
      */
     public void RecordHash(int hash, int profundidad, int heuristica, int flag, Point from, Point to, CellType player){
-        HashInfo hI = new HashInfo(heuristica, profundidad, from, to , player);
-        zh.put(hash, hI);
+        HashInfo hI = new HashInfo(heuristica, profundidad, from, to);
+        if(player == this.player) zhPlayer.put(hash, hI);
+        else zhEnemy.put(hash, hI);
     }
  
     /**
