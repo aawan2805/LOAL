@@ -391,7 +391,7 @@ public class LOALIDSZB implements IPlayer, IAuto {
         for (int i = 0; i < numeroSets; i++) {
             distanciaMinima[i] = -1;
         }
-        Point puntoCuleable = new Point((int) s.getSize()/2, (int) s.getSize()/2);
+        Point px = new Point((int) s.getSize()/2, (int) s.getSize()/2);
         ArrayList<ArrayList<Integer>> list_disjoint=ds.get_set();
         ArrayList<Integer> auxPrimaria, auxSecundaria;
         int prueba = 0; 
@@ -412,7 +412,7 @@ public class LOALIDSZB implements IPlayer, IAuto {
                            int valor = (int) primario.distance(secundario);
                            valorMinimo+=valor;
                        }
-                    int valor = (int) primario.distance(puntoCuleable);
+                    int valor = (int) primario.distance(px);
                     if(distanciaMinima[i]<valor) distanciaMinima[i] = valor;
                 }  
             }
@@ -439,15 +439,15 @@ public class LOALIDSZB implements IPlayer, IAuto {
      * @return Heurística para el tablero s y el jugador.
      */
     public int Eval(GameStatus s, CellType jugador) {
-        //System.out.println("entrando");
         int qn = s.getNumberOfPiecesPerColor(jugador);
-        // System.out.println(jugador);
         DisjointSet ds = new DisjointSet();
+        
         ArrayList<Point> pendingAmazons = new ArrayList<>();
         for (int q = 0; q < qn; q++) {
             ds.create_set(q);
             pendingAmazons.add(s.getPiece(jugador, q));
         }
+        
         for (int i = 0; i < pendingAmazons.size(); i++) {
             for (int j = 0; j < pendingAmazons.size(); j++) {
                 // No hace falta realmente porque tenemos un set.
@@ -455,16 +455,12 @@ public class LOALIDSZB implements IPlayer, IAuto {
                 Point second = pendingAmazons.get(j);
                 if (!first.equals(second)) {
                     if (first.distance(second) == 1) {
-                        // System.out.println(first + " -> " + second);
-                        // System.out.println(i + " " + j);
                         ds.union(i, j);
                     }
                 }
             }
         }
-        //System.out.println(ds.getNumberofDisjointSets());
-       
-       //System.out.println("saliendo");
+
         return puntuarTablero(jugador, s, pendingAmazons, ds, ds.getNumberofDisjointSets());
     }
     
@@ -491,6 +487,11 @@ public class LOALIDSZB implements IPlayer, IAuto {
         return "LOAL IDS";
     }
     
+    /**
+     * Calcula el hash para un board.
+     * @param s Tablero.
+     * @return Hash para el tablero s.
+     */
     private int hashBoard(GameStatus s) {
         int hash = 0;
         for (int i = 0; i < 8; i++) {

@@ -361,15 +361,17 @@ public class LOAL implements IPlayer, IAuto {
      */
     public int puntuarTablero(CellType jugador, GameStatus s, ArrayList<Point> pendingAmazons, DisjointSet ds,  int numeroSets){
         int valorMinimo=0;
-        //System.out.println(s);
         int[] distanciaMinima = new int[numeroSets];
         for (int i = 0; i < numeroSets; i++) {
             distanciaMinima[i] = -1;
         }
-        Point puntoCuleable = new Point((int) s.getSize()/2, (int) s.getSize()/2);
+        
+        Point px = new Point((int) s.getSize()/2, (int) s.getSize()/2);
         ArrayList<ArrayList<Integer>> list_disjoint=ds.get_set();
         ArrayList<Integer> auxPrimaria, auxSecundaria;
+        
         int prueba = 0; 
+        
         for (int i = 0; i < list_disjoint.size()-1; i++) {
             prueba++;
             auxPrimaria = list_disjoint.get(i);
@@ -386,19 +388,10 @@ public class LOAL implements IPlayer, IAuto {
                            Point secundario = pendingAmazons.get(auxSecundaria.get(l));
                            int valor = (int) primario.distance(secundario);
                            valorMinimo+=valor;
-//                           if(valorMinimoLista == -1 ) valorMinimoLista = valor;
-//                           else if(valor<valorMinimoLista) valorMinimoLista = valor;
-//                           System.out.println(auxPrimaria.get(k) + " " + auxSecundaria.get(l) + " " + valor);
                        }
-//                    System.out.println("valorMinimo " + valorMinimoLista);
-                    int valor = (int) primario.distance(puntoCuleable);
+                    int valor = (int) primario.distance(px);
                     if(distanciaMinima[i]<valor) distanciaMinima[i] = valor;
-//                    if(valorMinimoListaAuxiliar2 == -1 ) valorMinimoListaAuxiliar2 = valorMinimoLista;
-//                    else if(valorMinimoLista<valorMinimoListaAuxiliar2) valorMinimoListaAuxiliar2 = valorMinimoLista;
                 }  
-//                System.out.println("ValorMinimoParaLaArray: " + valorMinimoListaAuxiliar2);   
-                    
-//                valorMinimo += valorMinimoListaAuxiliar2;
             }
         }
         int ValorMinimoMedio = 0;
@@ -411,11 +404,8 @@ public class LOAL implements IPlayer, IAuto {
             Matrix = s.getPiece(jugador, i);
             valorMatriz+=matrix_valorcasilla[Matrix.x][Matrix.y];
         }
-//        System.out.println(prueba);
-        // System.out.println(valorMinimo);
+
         int valorFinal = 10 * (s.getNumberOfPiecesPerColor(jugador) - numeroSets) + (200-valorMinimo) + 2*(valorMatriz);
-        //System.out.println(valorFinal);
-        //System.out.println(" ");
         return valorFinal;
     }
     
