@@ -213,7 +213,7 @@ public class LOAL implements IPlayer, IAuto {
                 int newHash = aux.movePiece(posFicha, mov, hash, bitStringFrom, bitStringTo, s.getPos(mov) == jugador, eatPiecePos);
                 
                 // Tenemos un ciclo
-                if(historialPartida.contains(newHash)){
+                if(checkIfExistInList(historialPartida, newHash)){
                     continue;
                 }
                 
@@ -319,7 +319,7 @@ public class LOAL implements IPlayer, IAuto {
                 int newHash = aux.movePiece(posFicha, mov, hash, bitStringFrom, bitStringTo, s.getPos(mov) == enemy, eatPiecePos);
                 
                 // Tenemos un ciclo
-                if(historialPartida.contains(newHash)){
+                if(checkIfExistInList(historialPartida, newHash)){
                     continue;
                 }
                 

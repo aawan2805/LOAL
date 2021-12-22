@@ -3,6 +3,7 @@ package edu.upc.epsevg.prop.loa.players;
 import edu.upc.epsevg.prop.loa.DisjointSet;
 import edu.upc.epsevg.prop.loa.CellType;
 import edu.upc.epsevg.prop.loa.GameStatus;
+import edu.upc.epsevg.prop.loa.GameStatusAdvances;
 import edu.upc.epsevg.prop.loa.HashInfo;
 import edu.upc.epsevg.prop.loa.IAuto;
 import edu.upc.epsevg.prop.loa.IPlayer;
@@ -46,6 +47,7 @@ public class LOALIDSZB implements IPlayer, IAuto {
     };
     HashMap<Integer, HashInfo> zhPlayer = new HashMap<>();
     HashMap<Integer, HashInfo> zhEnemy = new HashMap<>();
+    ArrayList<Integer> historialPartida = new ArrayList<>(); // Para evitar los ciclos
     int[][][] bitString = new int[8][8][2];
     
     
@@ -67,6 +69,19 @@ public class LOALIDSZB implements IPlayer, IAuto {
         }
     }
 
+    /**
+     * Comprueba si el hash existe en la lista.
+     * @param lista Lista en la cual buscar
+     * @param hash Valor a buscar en la lista
+     * @return True si existe o False si no existe
+     */
+    public boolean checkIfExistInList(ArrayList<Integer> lista, int hash){
+        for (int i = 0; i < lista.size(); i++) {
+            if(lista.get(i) == hash) return true;
+        }
+        return false;
+    }
+    
     /**
      * Decideix el moviment del jugador donat un tauler i un color de peça que
      * ha de posar.
@@ -93,6 +108,8 @@ public class LOALIDSZB implements IPlayer, IAuto {
         
         int profExplorada = 0;
         
+        CellType enemy = CellType.opposite(this.player);
+        
         while(!this.timeout && !win){
             // Recorremos el número de fichas que tenemos en la partida
             for (int i = 0; i < s.getNumberOfPiecesPerColor(this.player) && !win; i++) {
@@ -100,24 +117,29 @@ public class LOALIDSZB implements IPlayer, IAuto {
                 Point posFicha = s.getPiece(this.player, i);
                 // Iteramos sobre sus posibles movimientos
                 for(Point mov: s.getMoves(posFicha)){
-                    GameStatus aux = new GameStatus(s);
-                    // TODO: mov és pieza del adversario?
+                    GameStatusAdvances aux = new GameStatusAdvances(s);
+                
+                    int bitStringFrom = bitString[posFicha.x][posFicha.y][CellType.toColor01(this.player)];
+                    int bitStringTo = bitString[mov.x][mov.y][CellType.toColor01(this.player)];
+                    int eatPiecePos = bitString[mov.x][mov.y][CellType.toColor01(enemy)];
+                    int newHash = aux.movePiece(posFicha, mov, hash, bitStringFrom, bitStringTo, aux.getPos(mov) == this.player, eatPiecePos);
 
-                    /*if(s.getPos(mov) == enemy && s.getNumberOfPiecesPerColor(enemy) <= num_fichas_enemigas){
-                        //System.out.println("Hola");
-                        continue;
-                    }*/
-                    // Movemos la ficha
-                    aux.movePiece(posFicha, mov);
+                    // Añadimos el movimiento, para que evitar ciclos
+                    historialPartida.add(0, newHash);
+                
                     if(aux.isGameOver() && aux.GetWinner() == this.player){
                         // Hemos ganado
                         from = posFicha;
                         to = mov;
                         win = true;
+                        historialPartida.remove(0);
                         break;
                     }
                     // TODO: Check if is solution
                     int x = MinValor(aux, Integer.MIN_VALUE, Integer.MAX_VALUE, profExplorada, this.player, hash);
+                    
+                    historialPartida.remove(0);
+                    
                     if(x >= Valor){
                         from = posFicha;
                         to = mov;
@@ -143,20 +165,12 @@ public class LOALIDSZB implements IPlayer, IAuto {
      * @return El valor beta más pequeño posible a partir del tablero s.
      */
     public int MinValor(GameStatus s, int alfa, int beta, int prof, CellType jugador, int hash){
-        //int val1 = ProbeHash(hash, profundidad, alfa, beta);
-        //if(val1 != -1) return val1;
         if(prof == 0 || this.timeout){
-            this.nodosExplorados++;
-            
             int Heuristica1 =  Eval(s, jugador);
             int Heuristica2 = Eval(s, CellType.opposite(jugador));
            // System.out.println(Heuristica1 + " " + Heuristica2 + " valor total " + (Heuristica1-Heuristica2));
-            int heur = Heuristica1-Heuristica2;
-            // RecordHash(hash, profundidad, heur, 0, new Point(0, 0), new Point(0,0));
-            
-            return heur;
+            return Heuristica1-Heuristica2;
         }
-        
         CellType enemy = CellType.opposite(jugador);
         
         Point bestMoveFrom = null; 
@@ -170,29 +184,23 @@ public class LOALIDSZB implements IPlayer, IAuto {
         for (int i = 0; i < s.getNumberOfPiecesPerColor(enemy); i++) {
             froms.add(s.getPiece(enemy, i));
         }
-        // Tablero ya analizado?
-        /*if(zh.containsKey(hash)){
-            HashInfo hI = zh.get(hash);
-            if(hI.profundidad >= prof) {
-                return hI.heuristica;
+
+        // ========= Zobrist ========== //
+        if(zhEnemy.containsKey(hash)){
+            HashInfo hI = zhEnemy.get(hash);
+            
+            bestMoveFrom = hI.mejorMovimientoDesde;
+            bestMoveTo = hI.mejorMejorMovimientoA;
+
+            int indexFrom = froms.indexOf(bestMoveFrom);
+            if(indexFrom == -1) {
+                foundMovimientos = false;
+            } else {
+                Collections.swap(froms, indexFrom, 0);
             }
             
-            if(hI.who == enemy){
-                bestMoveFrom = hI.mejorMovimientoDesde;
-                bestMoveTo = hI.mejorMejorMovimientoA;
-
-                int indexFrom = froms.indexOf(bestMoveFrom);
-                if(indexFrom == -1) {
-                    foundMovimientos = false;
-                } else {
-                    Collections.swap(froms, indexFrom, 0);
-                }
-            } else {
-                System.out.println("COLISIÓN min " + jugador);
-            }
-        }*/
-        
-        //TreeMap<Integer, List<Point>> bestMove = new TreeMap<>();
+        }
+        // ========= Zobrist ========== //
         
         for (Point posFicha: froms) {
             ArrayList<Point> moves = s.getMoves(posFicha);
@@ -207,23 +215,24 @@ public class LOALIDSZB implements IPlayer, IAuto {
             }
             // Iteramos sobre sus posibles movimientos
             for(Point mov: moves){               
-                GameStatus aux = new GameStatus(s);
-                aux.movePiece(posFicha, mov);
+                GameStatusAdvances aux = new GameStatusAdvances(s);
+
+                int bitStringFrom = bitString[posFicha.x][posFicha.y][CellType.toColor01(enemy)];
+                int bitStringTo = bitString[mov.x][mov.y][CellType.toColor01(enemy)];
+                int eatPiecePos = bitString[mov.x][mov.y][CellType.toColor01(jugador)];                
+                int newHash = aux.movePiece(posFicha, mov, hash, bitStringFrom, bitStringTo, s.getPos(mov) == jugador, eatPiecePos);
                 
-                int newHash = hash;
-                newHash ^= bitString[posFicha.x][posFicha.y][CellType.toColor01(enemy)];
-                newHash ^= bitString[mov.x][mov.y][CellType.toColor01(enemy)];
-                if(s.getPos(mov) == jugador){
-                    newHash ^= bitString[mov.x][mov.y][CellType.toColor01(jugador)];
-                }
-                    
+                 // Tenemos un ciclo
+//                if(checkIfExistInList(historialPartida, newHash)){
+//                    continue;
+//                }
+                
                 if(aux.isGameOver() && aux.GetWinner() == enemy){
                     // Vamos mal!
                     beta = Integer.MIN_VALUE;
                     bestMoveFromZB = posFicha;
                     bestMoveToZB = mov;
                 } else {
-                    // If < que beta
                     int valor = MaxValor(aux, alfa, beta, prof-1, jugador, newHash);
                     if(valor < beta){
                         beta = valor;
@@ -232,20 +241,14 @@ public class LOALIDSZB implements IPlayer, IAuto {
                     }
                 }
 
-                // Guardamos el movimiento para posteriormente evaluar
-                //bestMove.put(beta, Arrays.asList(posFicha, mov));
-
                 if(beta <= alfa){
-                    //RecordHash(newHash, profundidad, beta, 1, posFicha, mov);
                     return beta;
                 }
             }
             
         }
-        
-               
-        //List<Point> max = bestMove.get(bestMove.firstKey());
-        //RecordHash(hash, prof, beta, 0, bestMoveFromZB, bestMoveToZB, enemy);
+                       
+        RecordHash(hash, prof, beta, bestMoveFromZB, bestMoveToZB, enemy);
         return beta;
     }
     /**
@@ -259,22 +262,14 @@ public class LOALIDSZB implements IPlayer, IAuto {
      * @return El valor alfa más grande posible a partir del tablero s.
      */
     public int MaxValor(GameStatus s, int alfa, int beta, int prof, CellType jugador, int hash){
-        //int hash2 = this.hashBoard(s);
-        //int val1 = ProbeHash(hash, profundidad, alfa, beta);
-        //if(val1 != -1) return val1;
-        
         if(prof == 0 || this.timeout){
             this.nodosExplorados++;
             
             int Heuristica1 =  Eval(s, jugador);
-            int Heuristica2 = Eval(s, CellType.opposite(jugador));            
-            int heur = Heuristica1-Heuristica2;
-            
-            return heur;
+            int Heuristica2 = Eval(s, CellType.opposite(jugador));
+            return Heuristica1-Heuristica2;
         }
-        
         CellType enemy = CellType.opposite(jugador);
-        // ========= Zobrist ========== //
         Point bestMoveFrom = null; 
         Point bestMoveTo = null;
         boolean foundMovimientos = true;
@@ -287,13 +282,10 @@ public class LOALIDSZB implements IPlayer, IAuto {
             froms.add(s.getPiece(jugador, i));
         }
         
+        // ========= Zobrist ========== //
         if(zhPlayer.containsKey(hash)){
             HashInfo hI = zhPlayer.get(hash);
                         
-            if(hI.profundidad >= prof) {
-                return hI.heuristica;
-            }
-
             bestMoveFrom = hI.mejorMovimientoDesde;
             bestMoveTo = hI.mejorMejorMovimientoA;
 
@@ -303,10 +295,12 @@ public class LOALIDSZB implements IPlayer, IAuto {
             } else {
                 Collections.swap(froms, indexFrom, 0);
             }
+            
         }
+        // ========= Zobrist ========== //
         
         boolean maxValFound = false;
-        // ========= Zobrist ========== //
+
         for (Point posFicha: froms) {
             if(maxValFound) break;
             
@@ -325,17 +319,18 @@ public class LOALIDSZB implements IPlayer, IAuto {
             for(Point mov: moves){
                 if(maxValFound) break;
                 
-                GameStatus aux = new GameStatus(s);
-                aux.movePiece(posFicha, mov);
+                GameStatusAdvances aux = new GameStatusAdvances(s);
+                //aux.movePiece(posFicha, mov);
+                                
+                int bitStringFrom = bitString[posFicha.x][posFicha.y][CellType.toColor01(jugador)];
+                int bitStringTo = bitString[mov.x][mov.y][CellType.toColor01(jugador)];
+                int eatPiecePos = bitString[mov.x][mov.y][CellType.toColor01(enemy)];
+                int newHash = aux.movePiece(posFicha, mov, hash, bitStringFrom, bitStringTo, s.getPos(mov) == enemy, eatPiecePos);
                 
-                int newHash = hash;
-                newHash ^= bitString[posFicha.x][posFicha.y][CellType.toColor01(jugador)];
-                newHash ^= bitString[mov.x][mov.y][CellType.toColor01(jugador)];
-                
-                // Deshacer movimiento. Porque se come una ficha.
-                if(s.getPos(mov) == enemy){
-                    newHash ^= bitString[mov.x][mov.y][CellType.toColor01(enemy)];
-                }
+                // Tenemos un ciclo
+//                if(checkIfExistInList(historialPartida, newHash)){
+//                    continue;
+//                }
                 
                 if(aux.isGameOver() && aux.GetWinner() == jugador){
                     // Vamos bien!
@@ -360,7 +355,7 @@ public class LOALIDSZB implements IPlayer, IAuto {
         
         if(bestMoveFromZB == null || bestMoveToZB == null) return alfa;
         
-        RecordHash(hash, prof, alfa, 0, bestMoveFromZB, bestMoveToZB, jugador);
+        RecordHash(hash, prof, alfa, bestMoveFromZB, bestMoveToZB, jugador);
         return alfa;
     }
 
@@ -374,7 +369,7 @@ public class LOALIDSZB implements IPlayer, IAuto {
      * @param to Mejor movimiento a
      * @param player Jugador que ha realizado el movimiento
      */
-    public void RecordHash(int hash, int profundidad, int heuristica, int flag, Point from, Point to, CellType player){
+    public void RecordHash(int hash, int profundidad, int heuristica, Point from, Point to, CellType player){
         HashInfo hI = new HashInfo(heuristica, profundidad, from, to);
         if(player == this.player) zhPlayer.put(hash, hI);
         else zhEnemy.put(hash, hI);
@@ -416,19 +411,10 @@ public class LOALIDSZB implements IPlayer, IAuto {
                            Point secundario = pendingAmazons.get(auxSecundaria.get(l));
                            int valor = (int) primario.distance(secundario);
                            valorMinimo+=valor;
-//                           if(valorMinimoLista == -1 ) valorMinimoLista = valor;
-//                           else if(valor<valorMinimoLista) valorMinimoLista = valor;
-//                           System.out.println(auxPrimaria.get(k) + " " + auxSecundaria.get(l) + " " + valor);
                        }
-//                    System.out.println("valorMinimo " + valorMinimoLista);
                     int valor = (int) primario.distance(puntoCuleable);
                     if(distanciaMinima[i]<valor) distanciaMinima[i] = valor;
-//                    if(valorMinimoListaAuxiliar2 == -1 ) valorMinimoListaAuxiliar2 = valorMinimoLista;
-//                    else if(valorMinimoLista<valorMinimoListaAuxiliar2) valorMinimoListaAuxiliar2 = valorMinimoLista;
                 }  
-//                System.out.println("ValorMinimoParaLaArray: " + valorMinimoListaAuxiliar2);   
-                    
-//                valorMinimo += valorMinimoListaAuxiliar2;
             }
         }
         int ValorMinimoMedio = 0;
@@ -441,11 +427,8 @@ public class LOALIDSZB implements IPlayer, IAuto {
             Matrix = s.getPiece(jugador, i);
             valorMatriz+=matrix_valorcasilla[Matrix.x][Matrix.y];
         }
-//        System.out.println(prueba);
-        // System.out.println(valorMinimo);
+        
         int valorFinal = 10 * (s.getNumberOfPiecesPerColor(jugador) - numeroSets) + (200-valorMinimo) + 2*(valorMatriz);
-        //System.out.println(valorFinal);
-        //System.out.println(" ");
         return valorFinal;
     }
     
