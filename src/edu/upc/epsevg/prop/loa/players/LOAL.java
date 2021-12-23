@@ -352,41 +352,25 @@ public class LOAL implements IPlayer, IAuto {
      */    
     public int puntuarTablero(CellType jugador, GameStatus s, ArrayList<Point> pendingAmazons, DisjointSet ds,  int numeroSets){
         int valorMinimo=0;
-        int[] distanciaMinima = new int[numeroSets];
-        for (int i = 0; i < numeroSets; i++) distanciaMinima[i] = -1;
         
-        Point puntoCentro = new Point((int) s.getSize()/2, (int) s.getSize()/2);
         ArrayList<ArrayList<Integer>> list_disjoint=ds.get_set();
         ArrayList<Integer> auxPrimaria, auxSecundaria;
-        
-        int prueba = 0; 
-        
+                
         for (int i = 0; i < list_disjoint.size()-1; i++) {
-            prueba++;
             auxPrimaria = list_disjoint.get(i);
             for (int j = i+1; j < list_disjoint.size(); j++) {
-                prueba++;
                 auxSecundaria=list_disjoint.get(j);
-                int valorMinimoListaAuxiliar2 = -1; 
                     for (int k = 0; k < auxPrimaria.size(); k++) {
-                    prueba++;
                     Point primario = pendingAmazons.get(auxPrimaria.get(k));
-                    int valorMinimoLista = -1;
                        for (int l = 0; l < auxSecundaria.size(); l++) {
-                           prueba++;
                            Point secundario = pendingAmazons.get(auxSecundaria.get(l));
                            int valor = (int) primario.distance(secundario);
                            valorMinimo+=valor;
                        }
-                    int valor = (int) primario.distance(puntoCentro);
-                    if(distanciaMinima[i]<valor) distanciaMinima[i] = valor;
                 }  
             }
         }
-        int ValorMinimoMedio = 0;
-        for (int i = 0; i < numeroSets; i++){
-            ValorMinimoMedio+=distanciaMinima[i];
-        }
+
         int valorMatriz=0;
         Point Matrix;
         for (int i = 0; i < s.getNumberOfPiecesPerColor(jugador); i++) {
