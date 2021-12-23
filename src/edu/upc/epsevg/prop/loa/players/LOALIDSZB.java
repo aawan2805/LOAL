@@ -459,7 +459,7 @@ public class LOALIDSZB implements IPlayer, IAuto {
     public void timeout() {
         // Bah! Humans do not enjoy timeouts, oh, poor beasts !
         this.timeout = true;
-        System.out.println("Eres un lento de mierda");
+        System.out.println("Eres un lento");
         
     }
 

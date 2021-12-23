@@ -456,7 +456,7 @@ public class LOAL implements IPlayer, IAuto {
     @Override
     public void timeout() {
         // Bah! Humans do not enjoy timeouts, oh, poor beasts !
-        System.out.println("Eres un lento de mierda");
+        System.out.println("Eres un lento");
     }
 
     /**
