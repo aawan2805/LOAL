@@ -9,29 +9,19 @@ import edu.upc.epsevg.prop.loa.IAuto;
 import edu.upc.epsevg.prop.loa.IPlayer;
 import edu.upc.epsevg.prop.loa.Move;
 import edu.upc.epsevg.prop.loa.SearchType;
-import edu.upc.epsevg.prop.loa.ZobristHashing;
 import java.awt.Point;
-import java.awt.geom.Point2D;
-import static java.lang.Thread.sleep;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 /**
- * Jugador humà de LOA
- * @author bernat
+ * Jugador LOAL
+ * @author Abdullah Bashir Yasmin, Mario Konstanty Kochan
  */
 public class LOAL implements IPlayer, IAuto {
-    String name;
     CellType player;
-    int profundidad = 3;
-    int nodosExplorados;
-    static int num_fichas_enemigas;
+    int profundidad;
+    int nodosExplorados; // Nodos total explorados
     int matrix_valorcasilla[][] = new int[][] {
             {21,21,21,21,21,21,21,21},
             {21,23,23,23,23,23,23,21},
@@ -145,7 +135,7 @@ public class LOAL implements IPlayer, IAuto {
     }
     
     /**
-     *
+     * Minimiza y explora los "peores" movimientos del jugador, de tal forma que el jugador enemigo salgamos menos beneficiado.
      * @param s Estado del juego (tablero)
      * @param alfa Valor heurístico más grande hasta el momento
      * @param beta Valor heurístico más pequeño hasta el momento
@@ -158,22 +148,16 @@ public class LOAL implements IPlayer, IAuto {
         if(prof == 0){
             int Heuristica1 =  Eval(s, jugador);
             int Heuristica2 = Eval(s, CellType.opposite(jugador));
-           // System.out.println(Heuristica1 + " " + Heuristica2 + " valor total " + (Heuristica1-Heuristica2));
             return Heuristica1-Heuristica2;
         }
         CellType enemy = CellType.opposite(jugador);
         
-        Point bestMoveFrom = null; 
-        Point bestMoveTo = null;
+        Point bestMoveFrom = null; // El mejor "movimiento desde" del zobrist.
+        Point bestMoveTo = null; // El mejor "movimiento a" del zobrist.
         boolean foundMovimientos = true;
         
-        Point bestMoveFromZB = null;
-        Point bestMoveToZB = null;
-        
         ArrayList<Point> froms = new ArrayList<>();
-        for (int i = 0; i < s.getNumberOfPiecesPerColor(enemy); i++) {
-            froms.add(s.getPiece(enemy, i));
-        }
+        for (int i = 0; i < s.getNumberOfPiecesPerColor(enemy); i++) froms.add(s.getPiece(enemy, i));
 
         // ========= Zobrist ========== //
         if(zhEnemy.containsKey(hash)){
@@ -183,14 +167,19 @@ public class LOAL implements IPlayer, IAuto {
             bestMoveTo = hI.mejorMejorMovimientoA;
 
             int indexFrom = froms.indexOf(bestMoveFrom);
+            // Nos aseguramos que el movimiento exista. Más que nada por si se da el caso que ya esa ficha se la ha comido el enemigo.
             if(indexFrom == -1) {
                 foundMovimientos = false;
             } else {
+                // Ponemos el mejor "movimiento desde" como el primero a explorar.
                 Collections.swap(froms, indexFrom, 0);
             }
             
         }
         // ========= Zobrist ========== //
+        
+        Point bestMoveFromZB = null;
+        Point bestMoveToZB = null;
         
         for (Point posFicha: froms) {
             ArrayList<Point> moves = s.getMoves(posFicha);
@@ -198,6 +187,7 @@ public class LOAL implements IPlayer, IAuto {
             if(bestMoveFrom != null && posFicha == bestMoveFrom && foundMovimientos){
                 int indexBestMoveTo = moves.indexOf(bestMoveTo);
                 if(indexBestMoveTo != -1){
+                    // Ponemos el mejor "movimiento a" como el primero a explorar.
                     Collections.swap(moves, indexBestMoveTo, 0);
                 }
             } else {
@@ -237,13 +227,14 @@ public class LOAL implements IPlayer, IAuto {
             }
             
         }
-                       
+        
+        // Nos acordamos del movimiento.
         RecordHash(hash, prof, beta, bestMoveFromZB, bestMoveToZB, enemy);
         return beta;
     }
 
     /**
-     *
+     * Maximiza y explora los mejores movimientos del jugador, de tal forma que el jugador salga más beneficiado.
      * @param s Estado del juego (tablero)
      * @param alfa Valor heurístico más grande hasta el momento
      * @param beta Valor heurístico más pequeño hasta el momento
@@ -260,13 +251,12 @@ public class LOAL implements IPlayer, IAuto {
             int Heuristica2 = Eval(s, CellType.opposite(jugador));
             return Heuristica1-Heuristica2;
         }
+        
         CellType enemy = CellType.opposite(jugador);
+        
         Point bestMoveFrom = null; 
         Point bestMoveTo = null;
         boolean foundMovimientos = true;
-        
-        Point bestMoveFromZB = null;
-        Point bestMoveToZB = null;
         
         ArrayList<Point> froms = new ArrayList<>();
         for (int i = 0; i < s.getNumberOfPiecesPerColor(jugador); i++) {
@@ -291,7 +281,9 @@ public class LOAL implements IPlayer, IAuto {
         // ========= Zobrist ========== //
         
         boolean maxValFound = false;
-
+        Point bestMoveFromZB = null;
+        Point bestMoveToZB = null;
+        
         for (Point posFicha: froms) {
             if(maxValFound) break;
             
@@ -311,7 +303,6 @@ public class LOAL implements IPlayer, IAuto {
                 if(maxValFound) break;
                 
                 GameStatusAdvances aux = new GameStatusAdvances(s);
-                //aux.movePiece(posFicha, mov);
                                 
                 int bitStringFrom = bitString[posFicha.x][posFicha.y][CellType.toColor01(jugador)];
                 int bitStringTo = bitString[mov.x][mov.y][CellType.toColor01(jugador)];
@@ -358,15 +349,13 @@ public class LOAL implements IPlayer, IAuto {
      * @param ds Grupos de fichas del jugador en el tablero s
      * @param numeroSets Número de grupos
      * @return Puntuación para el tablero s
-     */
+     */    
     public int puntuarTablero(CellType jugador, GameStatus s, ArrayList<Point> pendingAmazons, DisjointSet ds,  int numeroSets){
         int valorMinimo=0;
         int[] distanciaMinima = new int[numeroSets];
-        for (int i = 0; i < numeroSets; i++) {
-            distanciaMinima[i] = -1;
-        }
+        for (int i = 0; i < numeroSets; i++) distanciaMinima[i] = -1;
         
-        Point px = new Point((int) s.getSize()/2, (int) s.getSize()/2);
+        Point puntoCentro = new Point((int) s.getSize()/2, (int) s.getSize()/2);
         ArrayList<ArrayList<Integer>> list_disjoint=ds.get_set();
         ArrayList<Integer> auxPrimaria, auxSecundaria;
         
@@ -389,7 +378,7 @@ public class LOAL implements IPlayer, IAuto {
                            int valor = (int) primario.distance(secundario);
                            valorMinimo+=valor;
                        }
-                    int valor = (int) primario.distance(px);
+                    int valor = (int) primario.distance(puntoCentro);
                     if(distanciaMinima[i]<valor) distanciaMinima[i] = valor;
                 }  
             }
@@ -456,9 +445,9 @@ public class LOAL implements IPlayer, IAuto {
     }
     
     /**
-     * Calcula el hash dado el tablero s.
-     * @param s Tablero
-     * @return Zobrist Hash para tablero s.
+     * Calcula el hash para un board.
+     * @param s Tablero.
+     * @return Hash para el tablero s.
      */
     private int hashBoard(GameStatus s) {
         int hash = 0;

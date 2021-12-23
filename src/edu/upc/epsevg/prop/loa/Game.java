@@ -21,12 +21,12 @@ public class Game {
             @Override
             public void run() {
                 
-                IPlayer player1 = new MCCloudPlayer();
+                //IPlayer player1 = new MCCloudPlayer();
                 //IPlayer player1 = new BuckyPlayer(4);
                 //IPlayer player1 = new RandomPlayer("Random");
-                //IPlayer player1 = new HumanPlayer("españa");
-                //IPlayer player2 = new LOAL(4);
-                IPlayer player2 = new LOALIDSZB();
+                IPlayer player1 = new HumanPlayer("NASAR");
+                IPlayer player2 = new LOAL(4);
+                //IPlayer player2 = new LOALIDSZB();
                                 
                 new Board(player1 , player2, 10, Level.DIFFICULT);
              }

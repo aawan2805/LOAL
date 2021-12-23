@@ -9,7 +9,7 @@ import java.awt.Point;
 
 /**
  *
- * @author Abdullah Bashir Yasmin, Marc Capdevila
+ * @author Abdullah Bashir Yasmin, Mario Konstanty Kochan
  */
 public class GameStatusAdvances extends GameStatus {
     int hash;
@@ -23,8 +23,18 @@ public class GameStatusAdvances extends GameStatus {
         this.hash = 0;
     }
     
+    /**
+     * Realiza la acción de mover la ficha además calculando el nuevo hash.
+     * @param from Ficha que se mueve
+     * @param to Ficha hacia donde se mueve
+     * @param hash Hash del tablero
+     * @param fromZB Hash del punto (ficha) que se mueve
+     * @param toZB Hash del punto (ficha) a donde se mueve
+     * @param eatPiece Indica si se ha comido la ficha del enemigo
+     * @param eatPieceZB hash de la pieza que se ha comida
+     * @return Hash calculado para la nueva posición.
+     */
     public int movePiece(Point from, Point to, int hash, int fromZB, int toZB, boolean eatPiece, int eatPieceZB){
-        
         this.hash = hash;
         this.hash ^= fromZB;
         this.hash ^= toZB;

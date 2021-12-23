@@ -34,6 +34,11 @@ public class DisjointSet {
         disjointSet.add(map);
     }
  
+    /**
+     * Dado dos elementos, crea o los pone en el mismo conjunto.
+     * @param first Primer elemento a unir
+     * @param second Segundo elemento a unir
+     */
     public void union(int first, int second)
     {
         int first_rep = find_set(first);
@@ -72,6 +77,11 @@ public class DisjointSet {
  
         return;
     }
+    
+    /**
+     * Transforma el actual set en una representación más humana (para poder iterar) del conjunto.
+     * @return Lista con el conjunto y sus hijos.
+     */
     public ArrayList<ArrayList<Integer>> get_set(){
         ArrayList<ArrayList<Integer>> awan;
         awan = new ArrayList();
@@ -90,6 +100,11 @@ public class DisjointSet {
         return awan;
     }
     
+    /**
+     * Dado un elemento indica a que conjunto pertenece.
+     * @param element Elemento a buscar
+     * @return Conjunto al que pertenece
+     */
     public int find_set(int element)
     {
         for (int index = 0; index < disjointSet.size(); index++)
@@ -108,6 +123,10 @@ public class DisjointSet {
         return -1;
     }
  
+    /**
+     * Da información sobre cuántos conjuntos (grupos) se ha detectado.
+     * @return Número de grupos.
+     */
     public int getNumberofDisjointSets()
     {
         return disjointSet.size();

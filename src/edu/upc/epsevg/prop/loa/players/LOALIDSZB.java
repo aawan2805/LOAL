@@ -155,13 +155,13 @@ public class LOALIDSZB implements IPlayer, IAuto {
     }
 
     /**
-     *
+     * Minimiza y explora los "peores" movimientos del jugador, de tal forma que el jugador enemigo salgamos menos beneficiado.
      * @param s Estado del juego (tablero)
      * @param alfa Valor heurístico más grande hasta el momento
      * @param beta Valor heurístico más pequeño hasta el momento
      * @param prof Profundidad máxima a explorar
      * @param jugador Ficha del jugador (O ó @)
-     * @param hash Zobrist hash del tablero
+     * @param hash Zobrist Hash del tablero s
      * @return El valor beta más pequeño posible a partir del tablero s.
      */
     public int MinValor(GameStatus s, int alfa, int beta, int prof, CellType jugador, int hash){
@@ -251,14 +251,16 @@ public class LOALIDSZB implements IPlayer, IAuto {
         RecordHash(hash, prof, beta, bestMoveFromZB, bestMoveToZB, enemy);
         return beta;
     }
+    
+    
     /**
-     *
+     * Maximiza y explora los mejores movimientos del jugador, de tal forma que el jugador salga más beneficiado.
      * @param s Estado del juego (tablero)
      * @param alfa Valor heurístico más grande hasta el momento
      * @param beta Valor heurístico más pequeño hasta el momento
      * @param prof Profundidad máxima a explorar
      * @param jugador Ficha del jugador (O ó @)
-     * @param hash Zobrist hash del tablero
+     * @param hash Zobrist Hash del tablero s
      * @return El valor alfa más grande posible a partir del tablero s.
      */
     public int MaxValor(GameStatus s, int alfa, int beta, int prof, CellType jugador, int hash){
