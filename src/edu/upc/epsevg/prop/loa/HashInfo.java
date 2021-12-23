@@ -18,6 +18,13 @@ public class HashInfo {
     public Point mejorMovimientoDesde;
     public Point mejorMejorMovimientoA;
 
+    /**
+     * Crea una estuctura con la info proporcionada.
+     * @param heuristica La heuística obtenida
+     * @param profundidad La profunidad llegada
+     * @param mejorFicha Mejor ficha desde la cual se ha hecho el movimiento
+     * @param mejorMejorMovimientoFicha  Mejor ficha a donde se ha hecho el movimiento
+     */
     public HashInfo(int heuristica, int profundidad, Point mejorFicha, Point mejorMejorMovimientoFicha) {
         this.heuristica = heuristica;
         this.profundidad = profundidad;
