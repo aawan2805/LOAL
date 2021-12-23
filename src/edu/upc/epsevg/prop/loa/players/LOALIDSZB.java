@@ -59,7 +59,7 @@ public class LOALIDSZB implements IPlayer, IAuto {
     /**
      * Incializa la matriz para tener valores random seguros, de esta forma asegurar que la hash será única.
      */
-    private void startZobrist(){
+    public void startZobrist(){
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 for (int k = 0; k < 2; k++) {
@@ -494,7 +494,7 @@ public class LOALIDSZB implements IPlayer, IAuto {
      * @param s Tablero.
      * @return Hash para el tablero s.
      */
-    private int hashBoard(GameStatus s) {
+    public int hashBoard(GameStatus s) {
         int hash = 0;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
