@@ -22,9 +22,8 @@ public class Game {
             public void run() {
                 
                 //IPlayer player1 = new MCCloudPlayer();
-                //IPlayer player1 = new BuckyPlayer(4);
-                //IPlayer player1 = new RandomPlayer("Random");
-                IPlayer player1 = new HumanPlayer("NASAR");
+                IPlayer player1 = new BuckyPlayer(4);
+
                 IPlayer player2 = new LOAL(4);
                 //IPlayer player2 = new LOALIDSZB();
                                 
